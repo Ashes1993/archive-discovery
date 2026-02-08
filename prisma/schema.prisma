@@ -1,0 +1,47 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Movie {
+  id          String   @id @default(uuid())
+  archiveId   String   @unique  // e.g. "night_of_the_living_dead"
+  title       String
+  description String?  @db.Text
+  year        Int?
+  
+  // Normalized runtime in minutes (e.g. 96)
+  runtime     Int?     
+  
+  // The exact path to the highest quality MP4 (e.g. "/movies/night.mp4")
+  videoFile   String?  
+  
+  // The path to the thumbnail
+  posterFile  String?  
+
+  downloads   Int      @default(0)
+  rating      Float?
+
+  // Relationships (Many-to-Many)
+  categories  Category[]
+  tags        Tag[]
+
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+}
+
+model Category {
+  id     String  @id @default(uuid())
+  name   String  @unique // e.g. "SciFi_Horror", "Comedy_Films"
+  movies Movie[]
+}
+
+model Tag {
+  id     String  @id @default(uuid())
+  name   String  @unique // e.g. "black_and_white", "zombie"
+  movies Movie[]
+}

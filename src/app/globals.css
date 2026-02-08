@@ -1,26 +1,57 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
+@theme {
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --animate-blob: blob 10s infinite;
+
+  @keyframes blob {
+    0% {
+      transform: translate(0px, 0px) scale(1);
+    }
+    33% {
+      transform: translate(30px, -50px) scale(1.1);
+    }
+    66% {
+      transform: translate(-20px, 20px) scale(0.9);
+    }
+    100% {
+      transform: translate(0px, 0px) scale(1);
+    }
+  }
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@layer utilities {
+  .glass {
+    /* 1. Very low opacity (10%) so the purple bleeds through.
+       2. Heavy Blur (xl) to smear the background blobs.
+       3. Inner white shadow to create 'thickness'.
+       4. White/20 border for the edge.
+    */
+    @apply bg-white/10 backdrop-blur-xl border border-white/20 shadow-xl transition-all duration-300;
+
+    /* The "Glossy" Reflection: Inner light at the top */
+    box-shadow:
+      0 4px 30px rgba(0, 0, 0, 0.1),
+      inset 0 0 0 1px rgba(255, 255, 255, 0.1),
+      inset 0 0 20px rgba(255, 255, 255, 0.05);
+  }
+
+  .glass-hover {
+    /* On hover, it gets slightly frostier and brighter */
+    @apply hover:bg-white/20 hover:shadow-2xl hover:-translate-y-1 hover:border-white/40;
+    box-shadow:
+      0 20px 40px rgba(0, 0, 0, 0.1),
+      inset 0 0 0 1px rgba(255, 255, 255, 0.2),
+      inset 0 0 20px rgba(255, 255, 255, 0.1);
+  }
+
+  /* Buttons need to be more visible, so we give them a frostier look */
+  .glass-button {
+    @apply bg-white/20 backdrop-blur-lg border border-white/30 px-6 py-3 rounded-full font-medium text-slate-700 hover:bg-white/40 transition-all cursor-pointer;
   }
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  @apply text-slate-800 overflow-x-hidden;
 }
