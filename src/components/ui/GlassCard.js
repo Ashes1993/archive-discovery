@@ -1,6 +1,6 @@
 "use client";
 import { motion } from "framer-motion";
-import { cn } from "@/lib/utils"; // We'll create this utility helper in a second
+import { cn } from "@/lib/utils";
 
 export function GlassCard({
   children,
@@ -10,17 +10,26 @@ export function GlassCard({
 }) {
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, delay: delay }}
+      initial={{ opacity: 0, y: 15 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-50px" }}
+      transition={{ duration: 0.5, delay: delay, ease: "easeOut" }}
       className={cn(
-        "glass rounded-2xl p-6 relative overflow-hidden",
-        hoverEffect && "glass-hover cursor-pointer group",
+        // BASE STYLES:
+        "relative overflow-hidden",
+        "bg-surface", // Matte Dark Grey
+        "border border-border-subtle", // Thin, subtle border
+        "rounded-md", // Sharper corners (was rounded-2xl)
+
+        // HOVER STYLES:
+        hoverEffect &&
+          "group hover:border-border-active hover:bg-surface-hover transition-colors duration-300 cursor-pointer",
+
         className,
       )}
     >
-      {/* Subtle sheen animation container */}
-      <div className="absolute inset-0 bg-gradient-to-tr from-white/0 via-white/10 to-white/0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+      {/* Optional: Subtle Inner Glow on Hover (Top edge only) */}
+      <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
       {children}
     </motion.div>

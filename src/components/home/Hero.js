@@ -6,26 +6,36 @@ import { GlassButton } from "@/components/ui/GlassButton";
 export function Hero({ featuredMovies }) {
   return (
     <section className="relative min-h-[90vh] flex items-center justify-center overflow-hidden pt-20">
+      {/* Background Spotlight Effect */}
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[500px] bg-white/5 blur-[120px] rounded-full pointer-events-none -z-10" />
+
       <div className="container mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
         {/* Left: Text Content */}
         <div className="space-y-8 text-center lg:text-left z-10">
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
+            transition={{ duration: 0.8, ease: "easeOut" }}
           >
-            <span className="px-4 py-2 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-600 text-sm font-bold tracking-wide uppercase mb-4 inline-block">
-              Public Domain Remastered
-            </span>
-            <h1 className="text-5xl md:text-7xl font-bold text-slate-800 leading-tight">
-              Cinema history, <br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600">
-                Crystal Clear.
+            {/* Tech Stamp Badge */}
+            <div className="inline-flex items-center gap-2 px-3 py-1 mb-6 border-l-2 border-gold pl-3">
+              <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse" />
+              <span className="text-xs font-mono uppercase tracking-widest text-pewter">
+                Public Domain Archive
               </span>
+            </div>
+
+            <h1 className="text-5xl md:text-7xl font-serif font-bold text-silver leading-[1.1] tracking-tight">
+              Cinema history, <br />
+              <span className="text-gold italic">Restored.</span>
             </h1>
-            <p className="text-lg text-slate-600 mt-6 max-w-xl mx-auto lg:mx-0 leading-relaxed">
-              Discover thousands of restored classic films, documentaries, and
-              animations. No ads. No subscription. Just pure preservation.
+
+            <p className="text-lg text-pewter mt-6 max-w-xl mx-auto lg:mx-0 leading-relaxed font-sans">
+              Access a curated vault of culturally significant films,
+              documentaries, and silent masterpieces.
+              <span className="block mt-2 text-sm font-mono text-zinc-600 uppercase tracking-wide">
+                // No Ads. No Subs. Pure Preservation.
+              </span>
             </p>
           </motion.div>
 
@@ -36,49 +46,63 @@ export function Hero({ featuredMovies }) {
             className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start"
           >
             <Link href="/media">
-              <GlassButton className="bg-slate-900 text-white hover:bg-slate-800 shadow-xl hover:shadow-2xl px-8 py-4 text-lg">
+              <GlassButton className="px-8 py-4 text-base bg-silver text-noir hover:bg-white hover:border-white shadow-[0_0_20px_rgba(255,255,255,0.1)]">
                 Start Watching
               </GlassButton>
             </Link>
             <Link href="/about">
-              <GlassButton
-                variant="ghost"
-                className="px-8 py-4 text-lg border-slate-200"
-              >
-                Learn More
+              <GlassButton variant="ghost" className="px-8 py-4 text-base">
+                Manifesto
               </GlassButton>
             </Link>
           </motion.div>
         </div>
 
-        {/* Right: Floating Cards Animation */}
-        <div className="relative h-[600px] hidden lg:flex items-center justify-center perspective-1000">
-          {featuredMovies.map((movie, i) => (
+        {/* Right: Noir Cards Animation */}
+        <div className="relative h-[600px] hidden lg:flex items-center justify-center perspective-[1000px]">
+          {featuredMovies.slice(0, 3).map((movie, i) => (
             <motion.div
               key={movie.id}
-              initial={{ opacity: 0, y: 100, rotate: 0 }}
-              animate={{ opacity: 1, y: 0, rotate: (i - 1) * 6 }} // Fan out effect
+              initial={{ opacity: 0, y: 100, rotateX: 10 }}
+              animate={{ opacity: 1, y: 0, rotateX: 0, rotateZ: (i - 1) * 6 }} // Fan out
               transition={{
-                delay: 0.2 + i * 0.1,
-                duration: 0.8,
+                delay: 0.2 + i * 0.15,
+                duration: 1,
                 type: "spring",
+                stiffness: 50,
               }}
-              className="absolute w-64 aspect-[2/3] rounded-2xl overflow-hidden shadow-2xl border-4 border-white"
+              className="absolute w-72 aspect-[2/3] rounded-sm overflow-hidden shadow-2xl bg-noir border border-border-subtle group"
               style={{
                 zIndex: i,
-                x: (i - 1) * 40, // Horizontal offset
-                y: i === 1 ? -40 : 0, // Center card floats higher
+                x: (i - 1) * 60, // Spread horizontally
+                y: i === 1 ? -40 : 0, // Center card lifts up
               }}
             >
+              {/* Poster Image */}
               <img
                 src={`https://archive.org/download/${movie.archiveId}/${movie.posterFile}`}
                 alt={movie.title}
-                className="w-full h-full object-cover"
+                className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity duration-700 grayscale-[20%] group-hover:grayscale-0"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-4">
-                <p className="text-white font-bold text-sm line-clamp-1">
+
+              {/* Overlay Gradient */}
+              <div className="absolute inset-0 bg-gradient-to-t from-noir via-transparent to-transparent opacity-90" />
+
+              {/* Card Label */}
+              <div className="absolute bottom-0 inset-x-0 p-5 border-t border-white/5 bg-noir/80 backdrop-blur-sm">
+                <p className="text-silver font-serif font-bold text-lg line-clamp-1">
                   {movie.title}
                 </p>
+                <div className="flex justify-between items-center mt-2">
+                  <span className="text-[10px] font-mono text-gold uppercase tracking-widest">
+                    {movie.year || "Classic"}
+                  </span>
+                  <span className="text-[10px] font-mono text-pewter">
+                    {movie.runtime
+                      ? `${Math.floor(movie.runtime / 60)}h ${movie.runtime % 60}m`
+                      : ""}
+                  </span>
+                </div>
               </div>
             </motion.div>
           ))}

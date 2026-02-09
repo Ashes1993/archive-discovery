@@ -1,7 +1,7 @@
 import { Hero } from "@/components/home/Hero";
 import { prisma } from "@/lib/prisma";
 
-export const revalidate = 3600; // Revalidate every hour
+export const revalidate = 3600;
 
 async function getFeaturedMovies() {
   // Fetch 3 movies with high download counts to show in the Hero

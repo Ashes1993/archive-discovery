@@ -22,7 +22,9 @@ export default async function MoviePage({ params }) {
   if (!data) {
     return (
       <div className="min-h-screen flex items-center justify-center pt-20">
-        <GlassCard>Movie not found in our curated collection.</GlassCard>
+        <GlassCard className="text-pewter font-mono">
+          Movie not found in our curated collection.
+        </GlassCard>
       </div>
     );
   }
@@ -33,24 +35,26 @@ export default async function MoviePage({ params }) {
   const posterUrl = `https://archive.org/download/${movie.archiveId}/${movie.posterFile}`;
 
   return (
-    <div className="container mx-auto px-4 md:px-6 min-h-screen pt-28 pb-12">
+    <div className="container mx-auto px-6 min-h-screen pt-32 pb-12">
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* LEFT COLUMN: Player & Info */}
-        <div className="lg:col-span-2 space-y-6">
+        <div className="lg:col-span-2 space-y-8">
+          {/* 1. Custom Player */}
           <VideoPlayer src={videoUrl} poster={posterUrl} title={movie.title} />
 
-          <GlassCard className="space-y-6">
+          {/* 2. Metadata Card */}
+          <GlassCard className="space-y-6 p-8">
             {/* Header: Title & Creator */}
             <div>
-              <h1 className="text-3xl font-bold text-slate-800">
+              <h1 className="text-3xl md:text-4xl font-serif font-bold text-silver tracking-wide leading-tight">
                 {movie.title}
               </h1>
               {movie.creator && (
-                <div className="mt-1 text-slate-500 font-medium">
+                <div className="mt-2 text-pewter font-sans text-sm tracking-wide">
                   Directed by{" "}
                   <Link
                     href={`/media?q=${encodeURIComponent(movie.creator)}`}
-                    className="text-indigo-600 hover:underline"
+                    className="text-gold hover:text-white transition-colors border-b border-gold/30 hover:border-white pb-0.5"
                   >
                     {movie.creator}
                   </Link>
@@ -58,27 +62,27 @@ export default async function MoviePage({ params }) {
               )}
             </div>
 
-            {/* Rich Metadata Bar */}
-            <div className="flex flex-wrap gap-2 text-xs font-medium uppercase tracking-wide">
+            {/* Rich Metadata Bar (Technical Look) */}
+            <div className="flex flex-wrap gap-3 text-xs font-mono uppercase tracking-wider text-pewter">
               {movie.year && (
-                <span className="px-3 py-1 bg-slate-100 rounded-full text-slate-600 border border-slate-200">
+                <span className="px-3 py-1 bg-noir border border-border-subtle rounded-sm">
                   {movie.year}
                 </span>
               )}
               {movie.language && (
-                <span className="px-3 py-1 bg-slate-100 rounded-full text-slate-600 border border-slate-200">
+                <span className="px-3 py-1 bg-noir border border-border-subtle rounded-sm">
                   {movie.language}
                 </span>
               )}
               {movie.color && (
-                <span className="px-3 py-1 bg-slate-100 rounded-full text-slate-600 border border-slate-200">
+                <span className="px-3 py-1 bg-noir border border-border-subtle rounded-sm">
                   {movie.color}
                 </span>
               )}
-              <span className="px-3 py-1 bg-indigo-50 text-indigo-600 rounded-full border border-indigo-100">
+              <span className="px-3 py-1 bg-noir border border-gold/20 text-gold rounded-sm">
                 ★ {movie.rating || 0} / 5
               </span>
-              <span className="px-3 py-1 bg-slate-100 rounded-full text-slate-600 border border-slate-200">
+              <span className="px-3 py-1 bg-noir border border-border-subtle rounded-sm">
                 {movie.downloads.toLocaleString()} views
               </span>
               {movie.licenseUrl && (
@@ -86,25 +90,26 @@ export default async function MoviePage({ params }) {
                   href={movie.licenseUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="px-3 py-1 bg-green-50 text-green-700 rounded-full border border-green-100 hover:bg-green-100 transition-colors"
+                  className="px-3 py-1 bg-noir border border-silver/20 text-silver hover:bg-silver/10 transition-colors rounded-sm flex items-center gap-1"
                 >
+                  <span className="w-1.5 h-1.5 rounded-full bg-green-500/70 inline-block mr-1"></span>
                   Public Domain
                 </a>
               )}
             </div>
 
-            <div className="h-px w-full bg-slate-200/60" />
+            <div className="h-px w-full bg-border-subtle my-6" />
 
             {/* Description */}
-            <p className="text-slate-600 leading-relaxed whitespace-pre-line">
+            <p className="text-pewter leading-relaxed whitespace-pre-line font-sans text-sm md:text-base">
               {movie.description || "No description available."}
             </p>
 
             {/* Categories */}
-            <div className="pt-2 flex gap-2 flex-wrap">
+            <div className="pt-4 flex gap-3 flex-wrap">
               {movie.categories.map((c) => (
                 <Link key={c.id} href={`/media?genre=${c.name}`}>
-                  <span className="text-xs font-bold text-slate-400 hover:text-indigo-600 cursor-pointer transition-colors uppercase tracking-wider">
+                  <span className="text-xs font-bold font-mono text-pewter hover:text-gold cursor-pointer transition-colors uppercase tracking-widest">
                     #{c.name}
                   </span>
                 </Link>
@@ -114,30 +119,30 @@ export default async function MoviePage({ params }) {
 
           {/* REVIEWS SECTION */}
           {movie.reviews && movie.reviews.length > 0 && (
-            <div className="space-y-4 pt-4">
-              <h3 className="text-xl font-bold text-slate-800 px-2">
-                Archivist Notes & Reviews
+            <div className="space-y-6 pt-4">
+              <h3 className="text-xl font-serif font-bold text-silver px-2 border-l-2 border-gold pl-4">
+                Archivist Notes
               </h3>
               <div className="grid gap-4">
                 {movie.reviews.map((review) => (
                   <GlassCard
                     key={review.id}
-                    className="p-4"
+                    className="p-6 bg-surface/50"
                     hoverEffect={false}
                   >
-                    <div className="flex justify-between items-start mb-2">
-                      <span className="font-semibold text-slate-800 text-sm">
+                    <div className="flex justify-between items-start mb-3">
+                      <span className="font-bold text-silver text-sm font-sans tracking-wide">
                         {review.author}
                       </span>
-                      <span className="text-yellow-500 text-xs">
+                      <span className="text-gold text-xs tracking-tighter">
                         {"★".repeat(review.rating || 5)}
                       </span>
                     </div>
-                    <p className="text-slate-600 text-sm leading-relaxed italic">
+                    <p className="text-pewter text-sm leading-relaxed italic font-serif border-l-2 border-border-subtle pl-4 mb-3">
                       "{review.body.substring(0, 300)}
                       {review.body.length > 300 ? "..." : ""}"
                     </p>
-                    <div className="mt-2 text-xs text-slate-400">
+                    <div className="text-[10px] font-mono text-zinc-600 uppercase">
                       {new Date(review.date).toLocaleDateString()}
                     </div>
                   </GlassCard>
@@ -149,35 +154,40 @@ export default async function MoviePage({ params }) {
 
         {/* RIGHT COLUMN: Related Media */}
         <div className="lg:col-span-1">
-          <h3 className="text-xl font-bold text-slate-800 mb-4 px-2">
-            Up Next
-          </h3>
+          <div className="sticky top-24">
+            <h3 className="text-lg font-serif font-bold text-silver mb-6 px-2 border-l-2 border-gold pl-4">
+              Up Next
+            </h3>
 
-          <div className="flex flex-col gap-4">
-            {related.map((item) => (
-              <Link key={item.id} href={`/media/${item.archiveId}`}>
-                <GlassCard
-                  className="p-3 flex gap-3 group hover:bg-white/40 transition-colors"
-                  hoverEffect={false}
-                >
-                  <div className="relative w-32 aspect-video bg-slate-200 rounded-lg overflow-hidden flex-shrink-0">
-                    <img
-                      src={`https://archive.org/download/${item.archiveId}/${item.posterFile}`}
-                      alt={item.title}
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                    />
-                  </div>
-                  <div className="flex flex-col justify-center min-w-0">
-                    <h4 className="font-semibold text-sm text-slate-800 line-clamp-2 leading-tight group-hover:text-indigo-600">
-                      {item.title}
-                    </h4>
-                    <span className="text-xs text-slate-500 mt-1">
-                      {item.year || "Classic"} • {item.rating} ★
-                    </span>
-                  </div>
-                </GlassCard>
-              </Link>
-            ))}
+            <div className="flex flex-col gap-4">
+              {related.map((item) => (
+                <Link key={item.id} href={`/media/${item.archiveId}`}>
+                  <GlassCard
+                    className="p-3 flex gap-4 group hover:bg-surface-hover hover:border-border-active transition-colors"
+                    hoverEffect={false}
+                  >
+                    {/* Thumbnail */}
+                    <div className="relative w-28 aspect-video bg-noir rounded-sm overflow-hidden flex-shrink-0 border border-border-subtle">
+                      <img
+                        src={`https://archive.org/download/${item.archiveId}/${item.posterFile}`}
+                        alt={item.title}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-80 group-hover:opacity-100"
+                      />
+                    </div>
+
+                    {/* Info */}
+                    <div className="flex flex-col justify-center min-w-0 py-1">
+                      <h4 className="font-medium text-sm text-silver line-clamp-2 leading-snug group-hover:text-gold transition-colors font-sans">
+                        {item.title}
+                      </h4>
+                      <span className="text-[10px] font-mono text-pewter mt-2 uppercase tracking-wide">
+                        {item.year || "Classic"} • {item.rating} ★
+                      </span>
+                    </div>
+                  </GlassCard>
+                </Link>
+              ))}
+            </div>
           </div>
         </div>
       </div>

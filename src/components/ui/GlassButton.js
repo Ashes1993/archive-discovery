@@ -7,22 +7,36 @@ export function GlassButton({
   onClick,
   className,
   variant = "primary",
+  disabled = false,
 }) {
   const variants = {
+    // PRIMARY: Solid White/Silver text on Dark Surface with a thin border
     primary:
-      "bg-slate-800 text-white hover:bg-slate-700 border-transparent shadow-lg",
-    glass: "glass-button hover:bg-white/40 text-slate-800",
+      "bg-surface text-silver border border-border-active hover:bg-border-subtle hover:text-white hover:border-silver shadow-md",
+
+    // ACCENT: Gold Text (Use sparingly for 'Watch Now' etc)
+    accent:
+      "bg-gold/10 text-gold border border-gold/20 hover:bg-gold/20 hover:border-gold/40",
+
+    // GHOST: Transparent with border (Wireframe)
     ghost:
-      "bg-transparent hover:bg-white/20 text-slate-700 border-transparent shadow-none",
+      "bg-transparent text-pewter border border-border-subtle hover:text-silver hover:border-border-active",
   };
 
   return (
     <motion.button
-      whileHover={{ scale: 1.02 }}
-      whileTap={{ scale: 0.98 }}
+      whileHover={disabled ? {} : { scale: 1.02 }}
+      whileTap={disabled ? {} : { scale: 0.98 }}
       onClick={onClick}
+      disabled={disabled}
       className={cn(
-        "px-6 py-3 rounded-full font-medium transition-all duration-300 border flex items-center gap-2 justify-center",
+        // BASE STYLES
+        "px-6 py-3",
+        "rounded-md", // Sharper corners
+        "font-sans font-medium text-sm tracking-wide", // Clean typography
+        "transition-all duration-300",
+        "flex items-center gap-2 justify-center",
+        "disabled:opacity-50 disabled:cursor-not-allowed",
         variants[variant],
         className,
       )}

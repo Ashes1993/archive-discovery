@@ -1,7 +1,7 @@
 import { getMovies } from "@/actions/media";
 import { MediaGrid } from "@/components/media/MediaGrid";
 import { ControlBar } from "@/components/media/ControlBar";
-import { prisma } from "@/lib/prisma"; // We need this to fetch categories once
+import { prisma } from "@/lib/prisma";
 
 export const revalidate = 3600;
 
@@ -10,7 +10,6 @@ export const metadata = {
   description: "Curated public domain movies.",
 };
 
-// Helper to get unique categories for the dropdown
 async function getCategories() {
   const categories = await prisma.category.findMany({
     select: { name: true },
@@ -26,26 +25,24 @@ export default async function MediaPage({ searchParams }) {
   const sort = params?.sort || "popular";
   const genre = params?.genre || "all";
 
-  // Fetch movies and categories in parallel
   const [movieData, genres] = await Promise.all([
-    getMovies({ query, page, sort, genre, limit: 20 }), // Increased limit to 20 for better grid feel
+    getMovies({ query, page, sort, genre, limit: 20 }),
     getCategories(),
   ]);
 
   return (
-    // FIX: pt-32 adds padding to top so Navbar doesn't cover content
     <div className="container mx-auto px-6 min-h-screen pt-32 pb-12">
-      <div className="flex flex-col gap-6 mb-8">
+      <div className="flex flex-col gap-8 mb-10">
         <div>
-          <h1 className="text-3xl font-bold text-slate-800 tracking-tight">
+          {/* NEO-NOIR TYPOGRAPHY */}
+          <h1 className="text-4xl font-serif font-bold text-silver tracking-wide mb-2">
             Explore Collection
           </h1>
-          <p className="text-slate-500 text-sm mt-1">
-            {movieData.metadata.total} movies available
+          <p className="text-pewter font-mono text-xs uppercase tracking-widest border-l-2 border-gold/50 pl-3">
+            {movieData.metadata.total} Titles Indexed
           </p>
         </div>
 
-        {/* New Consolidated Control Bar */}
         <ControlBar genres={genres} />
       </div>
 

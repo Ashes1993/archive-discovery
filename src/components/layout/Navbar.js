@@ -6,7 +6,7 @@ import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 
 const navLinks = [
-  { name: "Discover", href: "/media" },
+  { name: "Library", href: "/media" },
   { name: "Collections", href: "/collections" },
   { name: "About", href: "/about" },
 ];
@@ -15,7 +15,6 @@ export function Navbar() {
   const pathname = usePathname();
   const [scrolled, setScrolled] = useState(false);
 
-  // Detect scroll to toggle styles
   useEffect(() => {
     const handleScroll = () => {
       setScrolled(window.scrollY > 20);
@@ -30,24 +29,29 @@ export function Navbar() {
         className={cn(
           "pointer-events-auto mx-auto px-6 py-3 flex items-center justify-between transition-all duration-500 ease-in-out",
           // Base shape
-          "rounded-full max-w-5xl",
-          // CONDITION 1: Top of page (Transparent & Float)
-          !scrolled && "bg-white/10 backdrop-blur-md border border-white/20",
-          // CONDITION 2: Scrolled (Opaque & Solid)
-          // We increase opacity to 85% and shadow to ensure text underneath is hidden
+          "rounded-md max-w-5xl",
+
+          // CONDITION 1: Top of page (Transparent)
+          !scrolled && "bg-transparent border border-transparent",
+
+          // CONDITION 2: Scrolled (Matte Dark Surface)
+          // Uses bg-surface (Charcoal) with a subtle border
           scrolled &&
-            "bg-white/85 backdrop-blur-xl border border-white/50 shadow-lg shadow-indigo-500/5 translate-y-[-4px]",
+            "bg-surface/90 backdrop-blur-md border border-border-subtle shadow-2xl shadow-black/50 translate-y-[-4px]",
         )}
       >
-        {/* Logo */}
+        {/* LOGO: Typography Based */}
         <Link
           href="/"
-          className="font-bold text-xl tracking-tight bg-gradient-to-r from-slate-800 to-indigo-600 bg-clip-text text-transparent"
+          className="group flex items-center gap-2 font-serif font-bold text-lg tracking-wide text-silver hover:text-white transition-colors"
         >
-          Archive<span className="font-light text-slate-500">.Disc</span>
+          <span className="w-8 h-8 bg-silver text-noir flex items-center justify-center rounded-sm font-sans text-xs font-bold group-hover:bg-white transition-colors">
+            AD
+          </span>
+          ARCHIVE
         </Link>
 
-        {/* Links */}
+        {/* LINKS */}
         <div className="hidden md:flex items-center gap-1">
           {navLinks.map((link) => {
             const isActive = pathname === link.href;
@@ -55,12 +59,15 @@ export function Navbar() {
               <Link
                 key={link.name}
                 href={link.href}
-                className="relative px-4 py-2 rounded-full text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors"
+                className={cn(
+                  "relative px-4 py-2 rounded-md text-xs font-medium tracking-wide transition-colors uppercase",
+                  isActive ? "text-white" : "text-pewter hover:text-silver",
+                )}
               >
                 {isActive && (
                   <motion.div
                     layoutId="nav-pill"
-                    className="absolute inset-0 bg-indigo-500/10 rounded-full shadow-sm -z-10"
+                    className="absolute inset-0 bg-border-subtle rounded-md -z-10 border border-white/5"
                     transition={{ type: "spring", stiffness: 300, damping: 30 }}
                   />
                 )}
@@ -70,10 +77,17 @@ export function Navbar() {
           })}
         </div>
 
-        {/* Action */}
+        {/* ACTION / AVATAR */}
         <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold text-xs shadow-md">
-            A
+          {/* Simple Status Indicator instead of Avatar */}
+          <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-noir border border-border-subtle">
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-gold opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-gold"></span>
+            </span>
+            <span className="text-[10px] font-mono text-pewter uppercase tracking-wider">
+              Live
+            </span>
           </div>
         </div>
       </nav>

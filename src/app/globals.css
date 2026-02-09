@@ -1,57 +1,91 @@
 @import "tailwindcss";
 
 @theme {
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-  --animate-blob: blob 10s infinite;
+  /* FONTS */
+  --font-sans: var(--font-inter);
+  --font-serif: var(--font-playfair);
+  --font-mono: var(--font-mono);
 
-  @keyframes blob {
-    0% {
-      transform: translate(0px, 0px) scale(1);
-    }
-    33% {
-      transform: translate(30px, -50px) scale(1.1);
-    }
-    66% {
-      transform: translate(-20px, 20px) scale(0.9);
-    }
+  /* NEO-NOIR PALETTE */
+  --color-noir: #050505; /* Deepest Black */
+  --color-surface: #121212; /* Matte Charcoal */
+  --color-surface-hover: #1a1a1a;
+
+  --color-gold: #c5a059; /* Vintage Cinema Gold */
+  --color-gold-dim: #8a703d;
+
+  --color-silver: #e2e8f0; /* Projector White */
+  --color-pewter: #71717a; /* Muted Grey */
+
+  --color-border-subtle: #27272a;
+  --color-border-active: #52525b;
+
+  /* ANIMATIONS */
+  --animate-flicker: flicker 4s infinite;
+
+  @keyframes flicker {
+    0%,
     100% {
-      transform: translate(0px, 0px) scale(1);
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.97;
+    }
+    52% {
+      opacity: 0.9;
+    }
+    54% {
+      opacity: 0.97;
     }
   }
 }
 
 @layer utilities {
-  .glass {
-    /* 1. Very low opacity (10%) so the purple bleeds through.
-       2. Heavy Blur (xl) to smear the background blobs.
-       3. Inner white shadow to create 'thickness'.
-       4. White/20 border for the edge.
-    */
-    @apply bg-white/10 backdrop-blur-xl border border-white/20 shadow-xl transition-all duration-300;
-
-    /* The "Glossy" Reflection: Inner light at the top */
-    box-shadow:
-      0 4px 30px rgba(0, 0, 0, 0.1),
-      inset 0 0 0 1px rgba(255, 255, 255, 0.1),
-      inset 0 0 20px rgba(255, 255, 255, 0.05);
+  /* TEXTURE: Film Grain Class (Applied to Body in Layout) */
+  .film-grain {
+    position: relative;
+  }
+  .film-grain::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 9999;
+    opacity: 0.04;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
   }
 
-  .glass-hover {
-    /* On hover, it gets slightly frostier and brighter */
-    @apply hover:bg-white/20 hover:shadow-2xl hover:-translate-y-1 hover:border-white/40;
-    box-shadow:
-      0 20px 40px rgba(0, 0, 0, 0.1),
-      inset 0 0 0 1px rgba(255, 255, 255, 0.2),
-      inset 0 0 20px rgba(255, 255, 255, 0.1);
+  /* TYPOGRAPHY UTILITIES */
+  .text-shadow-sm {
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
   }
-
-  /* Buttons need to be more visible, so we give them a frostier look */
-  .glass-button {
-    @apply bg-white/20 backdrop-blur-lg border border-white/30 px-6 py-3 rounded-full font-medium text-slate-700 hover:bg-white/40 transition-all cursor-pointer;
+  .text-glow {
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
   }
 }
 
+/* BASE STYLES */
 body {
-  @apply text-slate-800 overflow-x-hidden;
+  background-color: var(--color-noir);
+  color: var(--color-silver);
+  /* Smooth scrolling for the cinematic feel */
+  scroll-behavior: smooth;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-noir);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-border-subtle);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-border-active);
 }

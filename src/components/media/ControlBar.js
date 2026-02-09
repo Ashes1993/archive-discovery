@@ -14,7 +14,7 @@ export function ControlBar({ genres = [] }) {
     } else {
       params.delete(key);
     }
-    params.set("page", "1"); // Reset pagination on change
+    params.set("page", "1"); // Reset pagination
     router.replace(`/media?${params.toString()}`);
   };
 
@@ -23,12 +23,12 @@ export function ControlBar({ genres = [] }) {
   }, 300);
 
   return (
-    <div className="glass p-4 rounded-2xl flex flex-col md:flex-row gap-4 items-center justify-between w-full">
-      {/* Search Input - Improved Design */}
+    <div className="bg-surface border border-border-subtle p-4 rounded-md flex flex-col md:flex-row gap-4 items-center justify-between w-full shadow-lg shadow-black/20">
+      {/* SEARCH INPUT */}
       <div className="relative w-full md:w-96 group">
         <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
           <svg
-            className="h-5 w-5 text-slate-400 group-focus-within:text-indigo-500 transition-colors"
+            className="h-4 w-4 text-pewter group-focus-within:text-gold transition-colors"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
@@ -43,40 +43,75 @@ export function ControlBar({ genres = [] }) {
         </div>
         <input
           type="text"
-          placeholder="Search classics..."
+          placeholder="Search the archive..."
           defaultValue={searchParams.get("q")?.toString()}
           onChange={(e) => handleSearch(e.target.value)}
-          className="w-full bg-white/40 border border-white/20 text-slate-800 text-sm rounded-xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500/50 block pl-10 p-2.5 outline-none transition-all placeholder:text-slate-400"
+          className="w-full bg-noir border border-border-subtle text-silver text-sm rounded-sm focus:ring-1 focus:ring-gold/20 focus:border-gold/50 block pl-10 p-2.5 outline-none transition-all placeholder:text-zinc-700 font-sans tracking-wide"
         />
       </div>
 
-      {/* Filters Area */}
+      {/* FILTERS AREA */}
       <div className="flex gap-3 w-full md:w-auto overflow-x-auto pb-2 md:pb-0">
         {/* Genre Select */}
-        <select
-          onChange={(e) => updateParam("genre", e.target.value)}
-          defaultValue={searchParams.get("genre") || "all"}
-          className="bg-white/40 border border-white/20 text-slate-700 text-sm rounded-xl focus:ring-blue-500 focus:border-blue-500 block p-2.5 outline-none cursor-pointer hover:bg-white/60 transition-colors"
-        >
-          <option value="all">All Genres</option>
-          {genres.map((g) => (
-            <option key={g} value={g}>
-              {g.replace(/_/g, " ")}
-            </option>
-          ))}
-        </select>
+        <div className="relative">
+          <select
+            onChange={(e) => updateParam("genre", e.target.value)}
+            defaultValue={searchParams.get("genre") || "all"}
+            className="appearance-none bg-noir border border-border-subtle text-pewter text-sm rounded-sm focus:ring-1 focus:ring-gold/20 focus:border-gold/50 block w-full p-2.5 pr-8 outline-none cursor-pointer hover:border-border-active transition-colors font-sans uppercase tracking-wider"
+          >
+            <option value="all">All Genres</option>
+            {genres.map((g) => (
+              <option key={g} value={g}>
+                {g.replace(/_/g, " ")}
+              </option>
+            ))}
+          </select>
+          {/* Custom Dropdown Arrow (Since we used appearance-none) */}
+          <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none text-pewter">
+            <svg
+              className="w-4 h-4"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M19 9l-7 7-7-7"
+              ></path>
+            </svg>
+          </div>
+        </div>
 
         {/* Sort Select */}
-        <select
-          onChange={(e) => updateParam("sort", e.target.value)}
-          defaultValue={searchParams.get("sort") || "popular"}
-          className="bg-white/40 border border-white/20 text-slate-700 text-sm rounded-xl focus:ring-blue-500 focus:border-blue-500 block p-2.5 outline-none cursor-pointer hover:bg-white/60 transition-colors"
-        >
-          <option value="popular">Most Popular</option>
-          <option value="rating">Highest Rated</option>
-          <option value="newest">Newest Year</option>
-          <option value="oldest">Oldest Year</option>
-        </select>
+        <div className="relative">
+          <select
+            onChange={(e) => updateParam("sort", e.target.value)}
+            defaultValue={searchParams.get("sort") || "popular"}
+            className="appearance-none bg-noir border border-border-subtle text-pewter text-sm rounded-sm focus:ring-1 focus:ring-gold/20 focus:border-gold/50 block w-full p-2.5 pr-8 outline-none cursor-pointer hover:border-border-active transition-colors font-sans uppercase tracking-wider"
+          >
+            <option value="popular">Most Popular</option>
+            <option value="rating">Highest Rated</option>
+            <option value="newest">Newest Year</option>
+            <option value="oldest">Oldest Year</option>
+          </select>
+          <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none text-pewter">
+            <svg
+              className="w-4 h-4"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M19 9l-7 7-7-7"
+              ></path>
+            </svg>
+          </div>
+        </div>
       </div>
     </div>
   );

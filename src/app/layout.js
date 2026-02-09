@@ -1,45 +1,48 @@
-import { Geist, Geist_Mono } from "next/font/google";
+import { Inter, Playfair_Display, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+// 1. Modern Sans for Body Text
+const inter = Inter({
   subsets: ["latin"],
+  variable: "--font-inter",
+  display: "swap",
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+// 2. Cinematic Serif for Headings
+const playfair = Playfair_Display({
   subsets: ["latin"],
+  variable: "--font-playfair",
+  display: "swap",
+});
+
+// 3. Tech Mono for Metadata
+const jetbrains = JetBrains_Mono({
+  subsets: ["latin"],
+  variable: "--font-mono",
+  display: "swap",
 });
 
 export const metadata = {
-  title: "Archive Discovery",
-  description: "A curated window into the public domain.",
+  title: "Archive Discovery | The Neo-Noir Collection",
+  description: "A digital preservation of classic cinema.",
 };
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased text-slate-800`}
-      >
-        {/* Fixed Background - Stronger Colors for Glass Effect */}
-        <div className="fixed inset-0 -z-10 bg-[#e0e7ff]">
-          {" "}
-          {/* Lighter Indigo Base */}
-          {/* Deep Purple Blob - Essential for contrast behind glass */}
-          <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] rounded-full bg-purple-400/40 blur-[100px] animate-blob" />
-          {/* Cyan/Blue Blob */}
-          <div className="absolute top-[20%] right-[-10%] w-[50%] h-[50%] rounded-full bg-cyan-300/40 blur-[100px] animate-blob animation-delay-2000" />
-          {/* Pink/Magenta Blob - Adds warmth */}
-          <div className="absolute bottom-[-10%] left-[20%] w-[60%] h-[50%] rounded-full bg-pink-300/40 blur-[100px] animate-blob animation-delay-4000" />
-        </div>
-
+    <html
+      lang="en"
+      className={`${inter.variable} ${playfair.variable} ${jetbrains.variable}`}
+    >
+      {/* bg-noir: Sets the deep black background
+         text-silver: Sets the default text color
+         film-grain: Adds the texture overlay defined in globals.css
+         selection: Custom highlight color 
+      */}
+      <body className="bg-noir text-silver antialiased selection:bg-gold selection:text-noir film-grain min-h-screen flex flex-col">
         <Navbar />
-
-        <main className="relative min-h-screen">{children}</main>
-
+        {children}
         <Footer />
       </body>
     </html>
