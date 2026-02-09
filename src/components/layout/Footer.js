@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 export function Footer() {
   return (
     <footer className="w-full py-12 mt-20 px-6">
@@ -15,15 +17,15 @@ export function Footer() {
 
         {/* Links Section */}
         <div className="flex gap-8 text-xs text-pewter font-medium uppercase tracking-wider">
-          <a href="#" className="hover:text-gold transition-colors">
+          <Link href="/about" className="hover:text-gold transition-colors">
             Manifesto
-          </a>
-          <a href="#" className="hover:text-gold transition-colors">
-            Public Domain
-          </a>
-          <a href="#" className="hover:text-gold transition-colors">
-            GitHub
-          </a>
+          </Link>
+          <Link href="/privacy" className="hover:text-gold transition-colors">
+            Privacy Policy
+          </Link>
+          <Link href="/terms" className="hover:text-gold transition-colors">
+            Terms of Use
+          </Link>
         </div>
       </div>
 

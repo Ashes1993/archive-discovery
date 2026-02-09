@@ -1,25 +1,32 @@
+import { getMovies } from "@/actions/media";
 import { Hero } from "@/components/home/Hero";
-import { prisma } from "@/lib/prisma";
+import { Marquee } from "@/components/home/Marquee";
+import { Spotlight } from "@/components/home/Spotlight";
+import { GenreVault } from "@/components/home/GenreVault";
 
 export const revalidate = 3600;
 
-async function getFeaturedMovies() {
-  // Fetch 3 movies with high download counts to show in the Hero
-  return await prisma.movie.findMany({
-    take: 3,
-    orderBy: { downloads: "desc" },
-    select: { id: true, title: true, archiveId: true, posterFile: true },
-  });
-}
-
 export default async function Home() {
-  const featuredMovies = await getFeaturedMovies();
+  // Fetch some movies for the Hero and Marquee
+  const featuredData = await getMovies({ sort: "downloads", limit: 10 });
+  const newArrivals = await getMovies({ sort: "newest", limit: 10 });
 
   return (
-    <div className="min-h-screen">
-      <Hero featuredMovies={featuredMovies} />
+    <main className="min-h-screen bg-noir">
+      {/* 1. HERO: The Introduction */}
+      <Hero featuredMovies={featuredData.data} />
 
-      {/* (Optional) We can add a "Featured Collections" strip here later */}
-    </div>
+      {/* 2. GENRE VAULT: Quick Navigation (Placed high for usability) */}
+      <GenreVault />
+
+      {/* 3. MARQUEE: "Trending Now" */}
+      <Marquee title="Crowd Favorites" movies={featuredData.data} />
+
+      {/* 4. SPOTLIGHT: Featured Masterpiece */}
+      <Spotlight />
+
+      {/* 5. MARQUEE: "Just Added" */}
+      <Marquee title="Recently Restored" movies={newArrivals.data} />
+    </main>
   );
 }
