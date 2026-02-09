@@ -26,12 +26,31 @@ model Movie {
   downloads   Int      @default(0)
   rating      Float?
 
+  creator     String?  // Director / Artist
+  language    String?  // e.g. "English", "French"
+  color       String?  // "color" or "black and white"
+  licenseUrl  String?  // Public Domain badge
+
+  publicDate  DateTime? // Maps to Archive's "publicdate"
+
   // Relationships (Many-to-Many)
   categories  Category[]
   tags        Tag[]
+  reviews     Review[]
 
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
+}
+
+model Review {
+  id        String   @id @default(uuid())
+  author    String
+  body      String   @db.Text
+  rating    Int?     // 1-5 stars
+  date      DateTime?
+  
+  movieId   String
+  movie     Movie    @relation(fields: [movieId], references: [id], onDelete: Cascade)
 }
 
 model Category {

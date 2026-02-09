@@ -1,37 +1,109 @@
 import { PrismaClient } from "@prisma/client";
-import { fetchClient } from "../src/lib/fetchClient.js"; // Using our Proxy Client
+import { fetchClient } from "../src/lib/fetchClient.js";
 import dotenv from "dotenv";
 
-// Load env vars so fetchClient can see the PROXY settings
 dotenv.config({ path: ".env" });
 dotenv.config({ path: ".env.local" });
 
 const prisma = new PrismaClient();
 
-// CONSTANTS
 const SEARCH_URL = "https://archive.org/advancedsearch.php";
 const METADATA_BASE = "https://archive.org/metadata";
-const MOVIES_TO_FETCH = 50; // Fetch top 50 for now
+const MOVIES_TO_FETCH = 50;
 
-// UTILS
-const cleanString = (str) => (str ? str.toString().trim() : null);
+// --- UTILS ---
+const cleanString = (str) => {
+  if (!str) return null;
+  if (Array.isArray(str)) return str[0].toString().trim();
+  return str.toString().trim();
+};
 
-// Convert "1:14:20" or "89 min" to integer minutes
+// Check for Audio Garbage (Old Time Radio, Podcasts, Audiobooks)
+const isGarbage = (doc, files) => {
+  const title = (doc.title || "").toLowerCase();
+  const collections = Array.isArray(doc.collection)
+    ? doc.collection
+    : [doc.collection];
+
+  // 1. Check Title Keywords
+  if (
+    title.includes("old time radio") ||
+    title.includes("audiobook") ||
+    title.includes("soundtrack") ||
+    title.includes("reading of")
+  ) {
+    return true;
+  }
+
+  // 2. Check Collections
+  const bannedCollections = [
+    "oldtimeradio",
+    "radioprograms",
+    "audio_book",
+    "librivox",
+    "podcast",
+    "78rpm",
+    "etree",
+    "audio_poetry",
+  ];
+  if (collections.some((c) => bannedCollections.includes(c))) return true;
+
+  // 3. THE "SOURCE AUDIT"
+  if (files && Array.isArray(files)) {
+    const originalFile = files.find((f) => f.source === "original");
+    if (originalFile) {
+      const ext = originalFile.name.split(".").pop().toLowerCase();
+      const audioExtensions = [
+        "mp3",
+        "flac",
+        "wav",
+        "ogg",
+        "m4a",
+        "wma",
+        "aac",
+      ];
+      if (audioExtensions.includes(ext)) {
+        return true; // BANNED: Origin was audio
+      }
+    }
+  }
+
+  return false;
+};
+
+const cleanColor = (val) => {
+  if (!val) return null;
+  const str = val.toString().toLowerCase().trim();
+  if (str.includes("black") && str.includes("white")) return "Black & White";
+  if (str.includes("b&w")) return "Black & White";
+  if (str.includes("color") || str.includes("colour")) return "Color";
+  return null;
+};
+
+const cleanLanguage = (val) => {
+  if (!val) return null;
+  const str = Array.isArray(val) ? val[0].toString() : val.toString();
+  const cleaned = str.trim();
+  if (cleaned.length === 0) return null;
+  return cleaned.charAt(0).toUpperCase() + cleaned.slice(1).toLowerCase();
+};
+
+const extractYear = (dateStr) => {
+  if (!dateStr) return null;
+  const match = dateStr.toString().match(/\d{4}/);
+  return match ? parseInt(match[0]) : null;
+};
+
 const parseRuntime = (timeStr) => {
   if (!timeStr) return null;
   const str = timeStr.toString();
-
-  // Format: "89 min"
   if (str.includes("min")) return parseInt(str);
-
-  // Format: "HH:MM:SS" or "MM:SS"
   const parts = str.split(":").map(Number);
-  if (parts.length === 3) return parts[0] * 60 + parts[1]; // Ignore seconds
+  if (parts.length === 3) return parts[0] * 60 + parts[1];
   if (parts.length === 2) return parts[0];
   return null;
 };
 
-// Filter out garbage collections
 const cleanCollections = (list) => {
   if (!Array.isArray(list)) return [];
   return list.filter(
@@ -43,17 +115,15 @@ const cleanCollections = (list) => {
   );
 };
 
-// Filter out garbage tags/subjects
 const cleanTags = (subject) => {
   if (!subject) return [];
   const list = Array.isArray(subject) ? subject : [subject];
-  return list.map((t) => t.toLowerCase()).filter((t) => t.length < 20); // Remove massive spam tags
+  return list.map((t) => t.toLowerCase()).filter((t) => t.length < 30);
 };
 
 async function main() {
-  console.log("🌱 Starting Smart Seed...");
+  console.log("🌱 Starting Rich Data Seed...");
 
-  // 1. SEARCH: Get top movies
   const searchParams = {
     q: "collection:(feature_films) AND mediatype:(movies)",
     fl: [
@@ -72,49 +142,68 @@ async function main() {
     output: "json",
   };
 
-  // Convert params to query string manually because our fetchClient is simple
   const queryString = new URLSearchParams(searchParams).toString();
   const searchResponse = await fetchClient(`${SEARCH_URL}?${queryString}`);
 
-  if (!searchResponse.ok) {
+  if (!searchResponse.ok)
     throw new Error(`Search failed: ${searchResponse.status}`);
-  }
 
   const searchData = await searchResponse.json();
   const docs = searchData.response.docs;
 
-  console.log(`Found ${docs.length} candidates. Fetching metadata...`);
+  console.log(`Found ${docs.length} candidates. Fetching detailed metadata...`);
 
-  // 2. PROCESS: Loop through each movie
   for (const doc of docs) {
     const archiveId = doc.identifier;
-    console.log(`\nProcessing: ${doc.title}...`);
+    process.stdout.write(`Processing: ${doc.title.substring(0, 30)}... `);
 
     try {
-      // A. Fetch file list to find the .mp4
       const metaResponse = await fetchClient(`${METADATA_BASE}/${archiveId}`);
       const metaData = await metaResponse.json();
       const files = metaData.files;
+      const details = metaData.metadata;
 
-      // B. Find BEST video file
-      // Logic: Prefer h.264 derivative. Avoid '512kb' low quality ones.
+      // 1. GARBAGE CHECK
+      if (isGarbage(doc, files)) {
+        console.log(`🗑️ Skipped (Audio/Fake Video)`);
+        continue;
+      }
+
+      // 2. VIDEO FILE SELECTION (The New Tiered Logic)
+      const BYTES_IN_MB = 1024 * 1024;
+      const MIN_SIZE_MB = 150; // Threshold for "Real Movie"
+
+      // TIER 1: Gold Standard (h.264)
       let videoFile = files.find(
         (f) =>
-          f.format === "h.264" &&
+          (f.format === "h.264" || f.format === "h.264 IA") &&
           f.source === "derivative" &&
           !f.name.includes("512kb"),
       );
 
-      // Fallback: Any MP4
-      if (!videoFile) videoFile = files.find((f) => f.name.endsWith(".mp4"));
-
-      // Skip if no playable video found
+      // TIER 2: Silver Standard (MPEG4/Ogg) - CHECK SIZE
       if (!videoFile) {
-        console.warn(`   ⚠️ No MP4 found for ${archiveId}. Skipping.`);
+        const fallback = files.find(
+          (f) =>
+            (f.format === "MPEG4" || f.format === "Ogg Video") &&
+            f.source === "derivative",
+        );
+
+        if (fallback) {
+          const size = parseInt(fallback.size || "0");
+          const sizeMB = size / BYTES_IN_MB;
+          if (sizeMB > MIN_SIZE_MB) {
+            videoFile = fallback; // Accepted: Big enough
+          }
+        }
+      }
+
+      // If still no video, skip
+      if (!videoFile) {
+        console.log("⚠️ Skipped (No suitable video source)");
         continue;
       }
 
-      // C. Find Poster
       const posterFile = files.find(
         (f) =>
           f.format === "Thumbnail" ||
@@ -122,45 +211,75 @@ async function main() {
           f.name.endsWith(".png"),
       );
 
-      // D. Clean Data
-      const categories = cleanCollections(doc.collection);
-      const tags = cleanTags(doc.subject);
-      const runtimeMinutes = parseRuntime(doc.runtime);
+      // 3. REVIEWS
+      const reviewsData = Array.isArray(metaData.reviews)
+        ? metaData.reviews.slice(0, 5).map((r) => ({
+            author: r.reviewer || "Anonymous",
+            body: r.reviewbody || "",
+            rating: parseInt(r.stars) || 0,
+            date: r.createdate ? new Date(r.createdate) : new Date(),
+          }))
+        : [];
 
-      // E. Save to DB
+      // 4. SMART YEAR
+      let finalYear = parseInt(doc.year);
+      if (!finalYear || isNaN(finalYear)) {
+        finalYear = extractYear(details.date);
+      }
+
+      // 5. DB UPSERT
       await prisma.movie.upsert({
         where: { archiveId },
-        update: {},
+        update: {
+          creator: cleanString(details.creator),
+          language: cleanLanguage(details.language),
+          color: cleanColor(details.color),
+          licenseUrl: cleanString(details.licenseurl),
+          year: finalYear || null,
+          publicDate: details.publicdate ? new Date(details.publicdate) : null,
+          reviews: {
+            deleteMany: {},
+            create: reviewsData,
+          },
+        },
         create: {
           archiveId,
           title: cleanString(doc.title),
           description: cleanString(doc.description),
-          year: parseInt(doc.year) || null,
-          runtime: runtimeMinutes,
+          year: finalYear || null,
+          runtime: parseRuntime(doc.runtime),
           downloads: doc.downloads,
           rating: doc.avg_rating,
           videoFile: videoFile.name,
           posterFile: posterFile ? posterFile.name : null,
-          // Connect/Create Categories
+          creator: cleanString(details.creator),
+          language: cleanLanguage(details.language),
+          color: cleanColor(details.color),
+          licenseUrl: cleanString(details.licenseurl),
+          publicDate: details.publicdate ? new Date(details.publicdate) : null,
           categories: {
-            connectOrCreate: categories.map((c) => ({
+            connectOrCreate: cleanCollections(doc.collection).map((c) => ({
               where: { name: c },
               create: { name: c },
             })),
           },
-          // Connect/Create Tags
           tags: {
-            connectOrCreate: tags.map((t) => ({
+            connectOrCreate: cleanTags(doc.subject).map((t) => ({
               where: { name: t },
               create: { name: t },
             })),
           },
+          reviews: {
+            create: reviewsData,
+          },
         },
       });
 
-      console.log(`   ✅ Saved! (Video: ${videoFile.name})`);
+      console.log(
+        `✅ Updated: ${cleanString(doc.title)} [${finalYear || "No Year"}]`,
+      );
     } catch (err) {
-      console.error(`   ❌ Failed: ${err.message}`);
+      console.log(`❌ Error: ${err.message}`);
     }
   }
 }

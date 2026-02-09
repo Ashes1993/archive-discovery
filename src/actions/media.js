@@ -82,7 +82,11 @@ export async function getMovie(archiveId) {
     // 1. Fetch the main movie
     const movie = await prisma.movie.findUnique({
       where: { archiveId },
-      include: { categories: true, tags: true },
+      include: {
+        categories: true,
+        tags: true,
+        reviews: { orderBy: { date: "desc" }, take: 10 },
+      },
     });
 
     if (!movie) return null;
