@@ -34,6 +34,8 @@ model Movie {
 
   publicDate  DateTime? // Maps to Archive's "publicdate"
 
+  isVerified  Boolean  @default(false) // Whether the movie has been verified for quality and metadata accuracy
+
   // Relationships (Many-to-Many)
   categories  Category[]
   tags        Tag[]
