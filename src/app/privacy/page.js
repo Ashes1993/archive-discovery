@@ -65,7 +65,7 @@ export default function PrivacyPage() {
                 href="mailto:hello@example.com"
                 className="text-gold hover:underline"
               >
-                hello@example.com
+                hello@archive-discovery.com
               </a>
             </p>
           </div>
