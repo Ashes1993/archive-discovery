@@ -1,9 +1,10 @@
 "use client";
 
-import { useState, useTransition, useEffect } from "react";
+import { useState, useTransition, useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 import { useRouter } from "next/navigation";
 import { updateMovieAdmin, deleteMovieAdmin } from "@/actions/admin";
+import { uploadPoster } from "@/actions/cloudinary";
 import { GlassButton } from "@/components/ui/GlassButton";
 
 const getImageUrl = (archiveId, posterFile) => {
@@ -21,7 +22,6 @@ export default function AdminClient({
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
 
-  // Required for React Portals in Next.js (avoids SSR hydration mismatch)
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
 
@@ -29,7 +29,10 @@ export default function AdminClient({
   const [previewImage, setPreviewImage] = useState(null);
   const [searchInput, setSearchInput] = useState(currentSearch);
 
-  // Prevent background scrolling when a modal is open
+  // Cloudinary Upload State & Ref
+  const [isUploading, setIsUploading] = useState(false);
+  const posterInputRef = useRef(null);
+
   useEffect(() => {
     if (editingMovie || previewImage) {
       document.body.style.overflow = "hidden";
@@ -52,11 +55,36 @@ export default function AdminClient({
     });
   };
 
+  // --- CLOUDINARY UPLOAD HANDLER ---
+  const handleImageUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setIsUploading(true);
+    const formData = new FormData();
+    formData.append("file", file);
+
+    const res = await uploadPoster(formData);
+
+    if (res.success) {
+      // Inject the new URL into the input field instantly
+      if (posterInputRef.current) {
+        posterInputRef.current.value = res.url;
+      }
+      setPreviewImage(res.url); // Show the uploaded image preview
+    } else {
+      alert("Upload failed: " + res.error);
+    }
+
+    setIsUploading(false);
+  };
+
   const handleSave = async (e) => {
     e.preventDefault();
     const formData = new FormData(e.target);
     const data = {
       title: formData.get("title"),
+      description: formData.get("description"),
       year: formData.get("year"),
       runtime: formData.get("runtime"),
       color: formData.get("color"),
@@ -120,7 +148,11 @@ export default function AdminClient({
             >
               <option value="all">All Movies</option>
               <option value="missing_poster">Missing Poster</option>
+              <option value="missing_director">Missing Director</option>
               <option value="missing_year">Missing Year</option>
+              <option value="missing_runtime">Missing Runtime</option>
+              <option value="missing_color">Missing Color</option>
+              <option value="missing_description">Missing Description</option>
             </select>
           </div>
         </div>
@@ -144,6 +176,8 @@ export default function AdminClient({
                 <th className="px-6 py-4">Year</th>
                 <th className="px-6 py-4">Color</th>
                 <th className="px-6 py-4">Runtime</th>
+                <th className="px-6 py-4">Downloads</th>
+                <th className="px-6 py-4">Description</th>
                 <th className="px-6 py-4 text-right">Actions</th>
               </tr>
             </thead>
@@ -197,6 +231,14 @@ export default function AdminClient({
                     <td className="px-6 py-4">{movie.color || "—"}</td>
                     <td className="px-6 py-4">
                       {movie.runtime ? `${movie.runtime}m` : "—"}
+                    </td>
+                    <td className="px-6 py-4 font-mono">
+                      {movie.downloads ? movie.downloads.toLocaleString() : "0"}
+                    </td>
+                    <td className="px-6 py-4">
+                      <p className="line-clamp-1 max-w-[200px] text-xs">
+                        {movie.description || "—"}
+                      </p>
                     </td>
                     <td className="px-6 py-4 text-right space-x-4">
                       <button
@@ -325,6 +367,18 @@ export default function AdminClient({
                   />
                 </div>
 
+                <div className="space-y-2">
+                  <label className="text-xs font-mono text-gold uppercase tracking-wider">
+                    Description
+                  </label>
+                  <textarea
+                    name="description"
+                    defaultValue={editingMovie.description || ""}
+                    rows={4}
+                    className="w-full bg-noir border border-border-subtle text-silver px-4 py-3 text-sm focus:border-gold outline-none resize-none"
+                  />
+                </div>
+
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <label className="text-xs font-mono text-gold uppercase tracking-wider">
@@ -366,27 +420,42 @@ export default function AdminClient({
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-xs font-mono text-gold uppercase tracking-wider flex justify-between">
+                  <label className="text-xs font-mono text-gold uppercase tracking-wider flex justify-between items-end">
                     <span>Poster Path / URL</span>
-                    {editingMovie.posterFile && (
-                      <span
-                        className="text-pewter cursor-pointer hover:text-white"
-                        onClick={() =>
-                          setPreviewImage(
-                            getImageUrl(
-                              editingMovie.archiveId,
-                              editingMovie.posterFile,
-                            ),
-                          )
-                        }
-                      >
-                        👁 Preview
-                      </span>
-                    )}
+                    <div className="flex gap-4 items-center">
+                      {editingMovie.posterFile && (
+                        <span
+                          className="text-pewter cursor-pointer hover:text-white transition-colors"
+                          onClick={() => {
+                            const currentVal =
+                              posterInputRef.current?.value ||
+                              editingMovie.posterFile;
+                            setPreviewImage(
+                              getImageUrl(editingMovie.archiveId, currentVal),
+                            );
+                          }}
+                        >
+                          👁 Preview
+                        </span>
+                      )}
+
+                      {/* --- CLOUDINARY UPLOAD BUTTON --- */}
+                      <label className="text-emerald-500 cursor-pointer hover:text-emerald-400 transition-colors font-bold">
+                        {isUploading ? "⏳ Uploading..." : "⬆ Upload New"}
+                        <input
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          onChange={handleImageUpload}
+                          disabled={isUploading}
+                        />
+                      </label>
+                    </div>
                   </label>
                   <input
                     type="text"
                     name="posterFile"
+                    ref={posterInputRef} // Connects the upload injection
                     defaultValue={editingMovie.posterFile || ""}
                     placeholder="Filename OR full http:// URL"
                     className="w-full bg-noir border border-border-subtle text-silver px-4 py-3 text-sm focus:border-gold outline-none"

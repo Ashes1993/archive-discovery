@@ -18,11 +18,13 @@ export async function getAdminMovies({
     where.title = { contains: search, mode: "insensitive" };
   }
 
-  if (filter === "missing_poster") {
-    where.posterFile = null;
-  } else if (filter === "missing_year") {
-    where.year = null;
-  }
+  // --- NEW FILTERS INTEGRATED ---
+  if (filter === "missing_poster") where.posterFile = null;
+  else if (filter === "missing_year") where.year = null;
+  else if (filter === "missing_director") where.creator = null;
+  else if (filter === "missing_runtime") where.runtime = null;
+  else if (filter === "missing_color") where.color = null;
+  else if (filter === "missing_description") where.description = null;
 
   const [movies, total] = await Promise.all([
     prisma.movie.findMany({
@@ -31,12 +33,13 @@ export async function getAdminMovies({
         id: true,
         archiveId: true,
         title: true,
+        description: true, // <-- ADDED DESCRIPTION
         year: true,
         runtime: true,
         color: true,
         posterFile: true,
         videoFile: true,
-        creator: true, // <-- ADDED CREATOR
+        creator: true,
         isVerified: true,
         downloads: true,
       },
@@ -61,12 +64,13 @@ export async function updateMovieAdmin(id, data) {
       where: { id },
       data: {
         title: data.title,
+        description: data.description, // <-- ADDED DESCRIPTION
         year: data.year ? parseInt(data.year) : null,
         runtime: data.runtime ? parseInt(data.runtime) : null,
         color: data.color,
         posterFile: data.posterFile,
         videoFile: data.videoFile,
-        creator: data.creator, // <-- ADDED CREATOR
+        creator: data.creator,
         isVerified: data.isVerified,
       },
     });
