@@ -11,13 +11,12 @@ export function Hero({ featuredMovies }) {
 
       <div className="container mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
         {/* Left: Text Content */}
-        <div className="space-y-8 text-center lg:text-left z-10">
+        <div className="space-y-8 text-center lg:text-left z-10 mt-12 lg:mt-0">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, ease: "easeOut" }}
           >
-            {/* Tech Stamp Badge */}
             <div className="inline-flex items-center gap-2 px-3 py-1 mb-6 border-l-2 border-gold pl-3">
               <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse" />
               <span className="text-xs font-mono uppercase tracking-widest text-pewter">
@@ -50,47 +49,42 @@ export function Hero({ featuredMovies }) {
                 Start Watching
               </GlassButton>
             </Link>
-            <Link href="/about">
+            <Link href="/collections">
               <GlassButton variant="ghost" className="px-8 py-4 text-base">
-                Manifesto
+                Browse Vaults
               </GlassButton>
             </Link>
           </motion.div>
         </div>
 
-        {/* Right: Noir Cards Animation */}
-        <div className="relative h-[600px] hidden lg:flex items-center justify-center perspective-[1000px]">
+        {/* Right: Noir Cards Animation (Hidden on Mobile) */}
+        <div className="relative h-[500px] lg:h-[600px] hidden md:flex items-center justify-center perspective-[1000px]">
           {featuredMovies.slice(0, 3).map((movie, i) => (
             <motion.div
               key={movie.id}
               initial={{ opacity: 0, y: 100, rotateX: 10 }}
-              animate={{ opacity: 1, y: 0, rotateX: 0, rotateZ: (i - 1) * 6 }} // Fan out
+              animate={{ opacity: 1, y: 0, rotateX: 0, rotateZ: (i - 1) * 8 }}
               transition={{
                 delay: 0.2 + i * 0.15,
                 duration: 1,
                 type: "spring",
                 stiffness: 50,
               }}
-              className="absolute w-72 aspect-[2/3] rounded-sm overflow-hidden shadow-2xl bg-noir border border-border-subtle group"
+              className="absolute w-56 lg:w-72 aspect-[2/3] rounded-sm overflow-hidden shadow-2xl bg-noir border border-border-subtle group"
               style={{
                 zIndex: i,
-                x: (i - 1) * 60, // Spread horizontally
-                y: i === 1 ? -40 : 0, // Center card lifts up
+                x: (i - 1) * 70,
+                y: i === 1 ? -40 : 0,
               }}
             >
-              {/* Poster Image */}
               <img
-                src={`https://archive.org/download/${movie.archiveId}/${movie.posterFile}`}
+                src={movie.posterFile}
                 alt={movie.title}
                 className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity duration-700 grayscale-[20%] group-hover:grayscale-0"
               />
-
-              {/* Overlay Gradient */}
               <div className="absolute inset-0 bg-gradient-to-t from-noir via-transparent to-transparent opacity-90" />
-
-              {/* Card Label */}
               <div className="absolute bottom-0 inset-x-0 p-5 border-t border-white/5 bg-noir/80 backdrop-blur-sm">
-                <p className="text-silver font-serif font-bold text-lg line-clamp-1">
+                <p className="text-silver font-serif font-bold text-base lg:text-lg line-clamp-1">
                   {movie.title}
                 </p>
                 <div className="flex justify-between items-center mt-2">
