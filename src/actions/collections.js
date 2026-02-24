@@ -2,63 +2,45 @@
 import { prisma } from "@/lib/prisma";
 
 export async function getCollections() {
-  // 1. Fetch all categories with their movie count
+  // 1. Fetch categories that contain AT LEAST ONE enriched movie (has an HTTP poster)
   const categories = await prisma.category.findMany({
+    where: {
+      movies: {
+        some: {
+          posterFile: { startsWith: "http" },
+        },
+      },
+    },
     include: {
+      // Get total count of movies in this category
       _count: {
         select: { movies: true },
       },
-      // Fetch the MOST POPULAR movie in this category to use as the cover
+      // Fetch the MOST POPULAR enriched movie to use as the background cover
       movies: {
+        where: {
+          posterFile: { startsWith: "http" },
+        },
         take: 1,
         orderBy: { downloads: "desc" },
         select: {
           posterFile: true,
-          archiveId: true,
-          color: true, // We can use this to add a B&W badge to the collection too!
         },
       },
     },
   });
 
-  // 2. Filter & Clean
-  // We exclude generic technical tags and tiny collections
-  const BANNED_COLLECTIONS = [
-    "feature_films",
-    "moviesandfilms",
-    "archive_films",
-    "uncategorized",
-  ];
-
+  // 2. Clean and Sort
   const cleaned = categories
-    .filter(
-      (c) =>
-        c._count.movies > 0 && // Must have movies
-        !BANNED_COLLECTIONS.includes(c.name.toLowerCase()),
-    )
+    .filter((c) => c._count.movies > 0 && c.movies.length > 0)
     .map((c) => ({
       id: c.id,
-      name: formatName(c.name),
-      slug: c.name, // Keep original for URL
+      name: c.name, // TMDB genres are already nicely capitalized (e.g., "Science Fiction")
+      slug: c.name, // Keep exact name for URL routing
       count: c._count.movies,
-      cover: c.movies[0]
-        ? {
-            url: `https://archive.org/download/${c.movies[0].archiveId}/${c.movies[0].posterFile}`,
-            color: c.movies[0].color,
-          }
-        : null,
+      coverUrl: c.movies[0].posterFile, // Use the direct TMDB/Cloudinary URL
     }))
-    .sort((a, b) => b.count - a.count); // Show biggest collections first
+    .sort((a, b) => b.count - a.count); // Show largest collections first
 
   return cleaned;
-}
-
-// Helper: "sci_fi_horror" -> "Sci-Fi Horror"
-function formatName(str) {
-  return str
-    .replace(/_/g, " ")
-    .replace(/-/g, " ")
-    .split(" ")
-    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(" ");
 }

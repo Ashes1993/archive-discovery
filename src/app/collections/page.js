@@ -34,27 +34,23 @@ export default async function CollectionsPage() {
         {collections.map((collection, index) => (
           <Link key={collection.id} href={`/media?genre=${collection.slug}`}>
             <GlassCard
-              // UPDATED: Removed 'h-64', added 'aspect-[3/2]' for better image ratio
-              className="group relative aspect-[3/2] overflow-hidden flex flex-col justify-end p-0 border-border-subtle"
+              className="group relative aspect-[3/2] overflow-hidden flex flex-col justify-end p-0 border-border-subtle shadow-lg hover:shadow-gold/10 transition-all duration-500"
               hoverEffect={true}
               delay={index * 0.05}
             >
-              {/* BACKGROUND IMAGE (The "Cover") */}
-              {collection.cover && (
+              {/* BACKGROUND IMAGE (The TMDB Cover) */}
+              {collection.coverUrl && (
                 <div className="absolute inset-0">
                   <img
-                    src={collection.cover.url}
+                    src={collection.coverUrl}
                     alt={collection.name}
-                    // UPDATED:
-                    // 1. Added 'object-top' to prioritize faces/titles in posters
-                    // 2. Reduced hover scale from scale-110 to scale-105 for clarity
                     className="w-full h-full object-cover object-top transition-all duration-700 
-                               opacity-60 group-hover:opacity-100 
-                               grayscale-[80%] group-hover:grayscale-0 
+                               opacity-50 group-hover:opacity-80 
+                               grayscale-[50%] group-hover:grayscale-0 
                                scale-100 group-hover:scale-105"
                   />
                   {/* Heavy Gradient Overlay for Text Readability */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-noir via-noir/60 to-transparent opacity-90" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-noir via-noir/80 to-transparent opacity-100" />
                 </div>
               )}
 
@@ -62,13 +58,13 @@ export default async function CollectionsPage() {
               <div className="relative z-10 p-6 w-full border-t border-white/5">
                 <div className="flex justify-between items-end">
                   <div>
-                    <h2 className="text-xl font-serif font-bold text-silver mb-1 group-hover:text-white transition-colors line-clamp-1">
+                    <h2 className="text-xl font-serif font-bold text-silver mb-1 group-hover:text-white transition-colors line-clamp-1 drop-shadow-md">
                       {collection.name}
                     </h2>
-                    <div className="h-0.5 w-0 group-hover:w-8 bg-gold transition-all duration-500 ease-out" />
+                    <div className="h-0.5 w-0 group-hover:w-12 bg-gold transition-all duration-500 ease-out shadow-[0_0_8px_rgba(212,175,55,0.6)]" />
                   </div>
 
-                  <span className="text-[10px] font-mono text-gold/80 bg-noir/50 px-2 py-1 rounded-sm border border-gold/20 uppercase tracking-wider flex-shrink-0">
+                  <span className="text-[10px] font-mono text-gold bg-noir/80 px-2 py-1 rounded-sm border border-gold/30 uppercase tracking-wider flex-shrink-0 shadow-black/50 shadow-md">
                     {collection.count}{" "}
                     {collection.count === 1 ? "Title" : "Titles"}
                   </span>
