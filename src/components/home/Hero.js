@@ -16,8 +16,8 @@ export function Hero({ featuredMovies }) {
           {featuredMovies.slice(0, 3).map((movie, i) => (
             <motion.div
               key={movie.id}
-              initial={{ opacity: 0, y: 100, rotateX: 10 }}
-              animate={{ opacity: 1, y: 0, rotateX: 0, rotateZ: (i - 1) * 8 }}
+              initial={{ opacity: 1, y: 50, rotateX: 10 }}
+              animate={{ y: 0, rotateX: 0, rotateZ: (i - 1) * 8 }}
               transition={{
                 delay: 0.2 + i * 0.15,
                 duration: 1,
@@ -81,7 +81,7 @@ export function Hero({ featuredMovies }) {
             <p className="text-base sm:text-lg text-pewter mt-4 md:mt-6 max-w-xl mx-auto lg:mx-0 leading-relaxed font-sans">
               Access a curated vault of culturally significant films,
               documentaries, and silent masterpieces.
-              <span className="block mt-2 text-[10px] sm:text-sm font-mono text-zinc-600 uppercase tracking-wide">
+              <span className="block mt-2 text-[10px] sm:text-sm font-mono text-zinc-400 uppercase tracking-wide">
                 // No Ads. No Subs. Pure Preservation.
               </span>
             </p>

@@ -35,10 +35,10 @@ export function Footer() {
 
       {/* Copyright */}
       <div className="max-w-7xl mx-auto mt-8 flex flex-col md:flex-row justify-between items-center px-4 gap-4">
-        <p className="text-[10px] text-zinc-600 font-mono tracking-widest text-center md:text-left">
+        <p className="text-[10px] text-zinc-400 font-mono tracking-widest text-center md:text-left">
           © {new Date().getFullYear()} ARCHIVE DISCOVERY PROJECT.
         </p>
-        <p className="text-[10px] text-zinc-600 font-mono tracking-widest text-center md:text-right">
+        <p className="text-[10px] text-zinc-400 font-mono tracking-widest text-center md:text-right">
           POWERED BY ARCHIVE.ORG & TMDB.
         </p>
       </div>
