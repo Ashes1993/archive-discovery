@@ -12,7 +12,7 @@ export function GlassButton({
   const variants = {
     // PRIMARY: Solid White/Silver text on Dark Surface with a thin border
     primary:
-      "bg-surface text-silver border border-border-active hover:bg-border-subtle hover:text-white hover:border-silver shadow-md",
+      "bg-surface text-silver border border-border-active hover:bg-border-subtle  hover:border-silver shadow-md",
 
     // ACCENT: Gold Text (Use sparingly for 'Watch Now' etc)
     accent:
