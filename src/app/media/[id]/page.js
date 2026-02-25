@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { getMovie } from "@/actions/media";
 import { VideoPlayer } from "@/components/media/VideoPlayer";
 import { GlassCard } from "@/components/ui/GlassCard";
@@ -196,18 +197,23 @@ export default async function MoviePage({ params }) {
                       className="p-3 flex gap-4 group hover:bg-surface-hover hover:border-gold/30 transition-all duration-300 shadow-lg"
                       hoverEffect={false}
                     >
-                      {/* Thumbnail (16:9 for sidebars) */}
-                      <div className="relative w-28 aspect-video bg-noir rounded-sm overflow-hidden flex-shrink-0 border border-border-subtle">
+                      {/* Thumbnail (Redesigned: Taller, premium poster shape) */}
+                      <div className="relative w-24 aspect-[2/3] bg-noir rounded-sm overflow-hidden flex-shrink-0 border border-border-subtle shadow-sm transition-all duration-300 group-hover:shadow-md group-hover:border-gold/30">
                         {relImageUrl ? (
-                          <img
+                          /* NEXT.JS IMAGE OPTIMIZATION */
+                          <Image
                             src={relImageUrl}
                             alt={item.title}
-                            className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-500 opacity-80 group-hover:opacity-100 grayscale-[20%] group-hover:grayscale-0"
+                            fill
+                            unoptimized={process.env.NODE_ENV === "development"}
+                            sizes="96px" // Perfect sizing for w-24 container
+                            // Removed object-top because object-cover now fits perfectly centered
+                            className="object-cover transition-transform duration-500 opacity-90 group-hover:opacity-100 grayscale-[20%] group-hover:grayscale-0 group-hover:scale-105"
                           />
                         ) : (
                           /* Fallback Typography Frame for Unenriched Items */
-                          <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-noir to-surface p-1 border-[2px] border-noir">
-                            <span className="text-gold font-serif text-[9px] leading-tight text-center line-clamp-3">
+                          <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-noir to-surface p-2 border-[2px] border-noir group-hover:border-gold/10 transition-colors">
+                            <span className="text-gold font-serif text-[9px] leading-tight text-center line-clamp-4">
                               {item.title}
                             </span>
                           </div>
