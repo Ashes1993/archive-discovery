@@ -1,5 +1,6 @@
 "use client";
 import Link from "next/link";
+import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { GlassButton } from "@/components/ui/GlassButton";
@@ -51,11 +52,14 @@ export function MediaGrid({ movies, pagination }) {
                 {/* POSTER CONTAINER (2:3 Aspect Ratio) */}
                 <div className="aspect-[2/3] w-full overflow-hidden bg-noir relative border-b border-border-subtle">
                   {imageUrl ? (
-                    <img
+                    <Image
                       src={imageUrl}
                       alt={movie.title}
-                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 opacity-90 group-hover:opacity-100"
-                      loading="lazy"
+                      fill
+                      unoptimized={process.env.NODE_ENV === "development"}
+                      // Maps perfectly to: grid-cols-2, sm:3, md:4, lg:5, xl:6
+                      sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, (max-width: 1280px) 20vw, 16vw"
+                      className="object-cover transition-transform duration-700 group-hover:scale-105 opacity-90 group-hover:opacity-100"
                     />
                   ) : (
                     /* PREMIUM FALLBACK FRAME */
