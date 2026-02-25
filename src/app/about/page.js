@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { GlassButton } from "@/components/ui/GlassButton";
 
@@ -15,7 +16,7 @@ export default function AboutPage() {
         <div className="inline-flex items-center gap-2 px-3 py-1 mb-6 border border-gold/30 rounded-full bg-gold/5">
           <span className="w-1.5 h-1.5 bg-gold rounded-full animate-pulse" />
           <span className="text-[10px] font-mono uppercase tracking-[0.2em] text-gold">
-            Est. 2025
+            Est. 2026
           </span>
         </div>
 
@@ -40,7 +41,7 @@ export default function AboutPage() {
         />
         <ValueCard
           title="Public Domain"
-          icon="M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A13.916 13.916 0 008 11a4 4 0 118 0c0 1.017-.07 2.019-.203 3m-2.118 6.844A21.88 21.88 0 0015.171 17m3.839 1.132c.645-2.266.99-4.659.99-7.131A8 8 0 008 8m0 0a8 8 0 00-8 8c0 2.472.345 4.865.99 7.131M8 8a8 8 0 0016 0c0-2.472-.345-4.865-.99-7.131M16 12V6m0 0L8 6m8 0zm-8 0v6"
+          icon="M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A13.916 13.916 0 008 11a4 4 0 118 0c0 1.017-.07 2.019-.203 3m-2.118 6.844A21.88 21.88 0 0015.171 17m3.839 1.132c.645-2.266.99-4.659.99-7.131A8 8 0 008 8m0 0a8 8 0 00-8 8c0 2.472.345 4.865.99-7.131M8 8a8 8 0 0016 0c0-2.472-.345-4.865-.99-7.131M16 12V6m0 0L8 6m8 0zm-8 0v6"
           desc="Every frame on this platform is free of copyright restrictions. You can remix, reuse, and share these films without legal barriers."
         />
         <ValueCard
@@ -51,7 +52,7 @@ export default function AboutPage() {
       </div>
 
       {/* SECTION 3: THE ORIGIN STORY */}
-      <GlassCard className="max-w-4xl mx-auto p-8 md:p-12 border-border-subtle bg-surface/50">
+      <GlassCard className="max-w-4xl mx-auto p-8 md:p-12 border-border-subtle bg-surface/50 mb-12">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
           <div>
             <h3 className="text-2xl font-serif font-bold text-silver mb-4">
@@ -72,7 +73,7 @@ export default function AboutPage() {
               </p>
             </div>
 
-            <div className="mt-8 flex gap-4">
+            <div className="mt-8 flex flex-wrap gap-4">
               <Link href="/media">
                 <GlassButton>Explore Library</GlassButton>
               </Link>
@@ -97,6 +98,40 @@ export default function AboutPage() {
           </div>
         </div>
       </GlassCard>
+
+      {/* SECTION 4: DATA PARTNERS (TMDB ATTRIBUTION) */}
+      <div className="max-w-4xl mx-auto text-center border-t border-border-subtle pt-12">
+        <p className="text-xs font-mono text-pewter uppercase tracking-widest mb-6">
+          Powered By Open Data
+        </p>
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-8 md:gap-16 opacity-70">
+          <a
+            href="https://archive.org"
+            target="_blank"
+            rel="noreferrer"
+            className="hover:opacity-100 transition-opacity"
+          >
+            <span className="font-serif font-bold text-2xl text-silver tracking-tight">
+              INTERNET ARCHIVE
+            </span>
+          </a>
+          <a
+            href="https://www.themoviedb.org/"
+            target="_blank"
+            rel="noreferrer"
+            className="hover:opacity-100 transition-opacity flex flex-col items-center"
+          >
+            {/* Official TMDB Logo */}
+            <Image
+              src="https://www.themoviedb.org/assets/2/v4/logos/v2/blue_short-8e7b30f73a4020692ccca9c88bafe5dcb6f8a62a4c6bc55cd9ba82bb2cd95f6c.svg"
+              alt="TMDB Logo"
+              width={120}
+              height={16}
+              unoptimized
+            />
+          </a>
+        </div>
+      </div>
     </div>
   );
 }

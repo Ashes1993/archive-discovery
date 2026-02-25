@@ -13,7 +13,7 @@ export default function PrivacyPage() {
         </h1>
 
         <GlassCard className="p-8 md:p-12 space-y-8 bg-surface border-border-subtle">
-          <div className="text-xs font-mono text-gold uppercase tracking-wider mb-8">
+          <div className="text-xs font-mono text-gold uppercase tracking-wider mb-8 border-b border-border-subtle pb-4">
             Last Updated: February 2026
           </div>
 
@@ -42,18 +42,28 @@ export default function PrivacyPage() {
 
           <Section title="3. Third-Party Sources">
             <p>
-              This platform serves content directly from{" "}
-              <strong>Archive.org</strong>. When you stream a video, you are
-              establishing a direct connection with the Internet Archive
-              servers. Their privacy policy applies to the data transfer of the
-              video stream itself.
+              This platform relies on external open-source databases to provide
+              content:
             </p>
+            <ul className="list-disc pl-5 space-y-2 mt-2">
+              <li>
+                <strong>Archive.org:</strong> When you stream a video, you
+                establish a direct connection with the Internet Archive servers.
+                Their privacy policy applies to the video data transfer.
+              </li>
+              <li>
+                <strong>TMDB (The Movie Database):</strong> We use TMDB to fetch
+                high-quality movie posters and metadata. Your browser may
+                download images directly from TMDB's Content Delivery Network
+                (CDN).
+              </li>
+            </ul>
           </Section>
 
           <Section title="4. Cookies">
             <p>
               We use zero tracking cookies. We strictly use functional cookies
-              required for the site to operate (e.g. remembering your grid view
+              required for the site to operate (e.g., remembering your grid view
               preference).
             </p>
           </Section>
@@ -62,10 +72,10 @@ export default function PrivacyPage() {
             <p className="text-sm text-pewter font-sans">
               Questions? Contact the archivist at{" "}
               <a
-                href="mailto:hello@example.com"
-                className="text-gold hover:underline"
+                href="mailto:archive-discovery@gmail.com"
+                className="text-gold hover:underline transition-colors"
               >
-                hello@archive-discovery.com
+                archive-discovery@gmail.com
               </a>
             </p>
           </div>

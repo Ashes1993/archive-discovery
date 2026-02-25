@@ -13,13 +13,13 @@ export default function TermsPage() {
         </h1>
 
         <GlassCard className="p-8 md:p-12 space-y-8 bg-surface border-border-subtle">
-          <div className="text-xs font-mono text-gold uppercase tracking-wider mb-8">
+          <div className="text-xs font-mono text-gold uppercase tracking-wider mb-8 border-b border-border-subtle pb-4">
             Effective Date: February 2026
           </div>
 
           <Section title="1. Public Domain Nature">
             <p>
-              The content hosted on this platform is believed to be in the{" "}
+              The video content hosted on this platform is believed to be in the{" "}
               <strong>Public Domain</strong> under U.S. Copyright Law. This
               means the copyright has expired, was never renewed, or the work
               was dedicated to the public domain.
@@ -31,7 +31,23 @@ export default function TermsPage() {
             </p>
           </Section>
 
-          <Section title="2. License & Usage">
+          <Section title="2. Third-Party APIs and Metadata">
+            <p>
+              To provide accurate metadata and cinematic poster artwork, Archive
+              Discovery utilizes The Movie Database (TMDB) API.
+            </p>
+            <p className="border-l-2 border-gold pl-4 italic bg-gold/5 py-2 pr-2">
+              This product uses the TMDB API but is not endorsed or certified by
+              TMDB.
+            </p>
+            <p>
+              By using our platform, you agree to respect the intellectual
+              property of TMDB's contributors. You may not scrape or
+              mass-download metadata provided by TMDB through our service.
+            </p>
+          </Section>
+
+          <Section title="3. License & Usage">
             <p>
               <strong>The Content:</strong> You are free to download, remix, and
               share the movies found here, as they belong to the public.
@@ -43,7 +59,7 @@ export default function TermsPage() {
             </p>
           </Section>
 
-          <Section title="3. Disclaimer of Warranties">
+          <Section title="4. Disclaimer of Warranties">
             <p>
               The service is provided "as is." We do not guarantee the
               preservation of these links in perpetuity, as we rely on the
@@ -52,7 +68,7 @@ export default function TermsPage() {
             </p>
           </Section>
 
-          <Section title="4. User Conduct">
+          <Section title="5. User Conduct">
             <p>
               While we celebrate free speech and historical preservation, we
               reserve the right to block access to users attempting to abuse the
