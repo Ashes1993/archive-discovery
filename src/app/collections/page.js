@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { getCollections } from "@/actions/collections";
 import { GlassCard } from "@/components/ui/GlassCard";
 
@@ -40,14 +41,16 @@ export default async function CollectionsPage() {
             >
               {/* BACKGROUND IMAGE (The TMDB Cover) */}
               {collection.coverUrl && (
-                <div className="absolute inset-0">
-                  <img
+                <div className="absolute inset-0 z-0">
+                  {/* NEXT.JS IMAGE OPTIMIZATION */}
+                  <Image
                     src={collection.coverUrl}
                     alt={collection.name}
-                    className="w-full h-full object-cover object-top transition-all duration-700 
-                               opacity-50 group-hover:opacity-80 
-                               grayscale-[50%] group-hover:grayscale-0 
-                               scale-100 group-hover:scale-105"
+                    fill
+                    unoptimized={process.env.NODE_ENV === "development"}
+                    // Maps perfectly to grid-cols-1, sm:2, md:3, lg:4
+                    sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                    className="object-cover object-top transition-all duration-700 opacity-50 group-hover:opacity-80 grayscale-[50%] group-hover:grayscale-0 scale-100 group-hover:scale-105"
                   />
                   {/* Heavy Gradient Overlay for Text Readability */}
                   <div className="absolute inset-0 bg-gradient-to-t from-noir via-noir/80 to-transparent opacity-100" />
