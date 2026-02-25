@@ -1,5 +1,6 @@
 "use client";
 import Link from "next/link";
+import Image from "next/image";
 import { motion } from "framer-motion";
 import { GlassButton } from "@/components/ui/GlassButton";
 
@@ -10,7 +11,7 @@ export function Hero({ featuredMovies }) {
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[500px] bg-white/5 blur-[120px] rounded-full pointer-events-none -z-10" />
 
       <div className="container mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-12 items-center">
-        {/* CARDS ANIMATION (Ordered to TOP on mobile, RIGHT on desktop) */}
+        {/* CARDS ANIMATION */}
         <div className="relative h-[400px] sm:h-[450px] lg:h-[600px] flex items-center justify-center perspective-[1000px] order-1 lg:order-2 mt-4 lg:mt-0 z-20">
           {featuredMovies.slice(0, 3).map((movie, i) => (
             <motion.div
@@ -23,20 +24,26 @@ export function Hero({ featuredMovies }) {
                 type: "spring",
                 stiffness: 50,
               }}
-              // Increased mobile width to w-48
               className="absolute w-48 sm:w-56 lg:w-72 aspect-[2/3] rounded-sm overflow-hidden shadow-2xl bg-noir border border-border-subtle group"
               style={{
                 zIndex: i,
                 x: (i - 1) * 55,
-                // Center card pops up, side cards drop down slightly
                 y: i === 1 ? -25 : 15,
               }}
             >
-              <img
-                src={movie.posterFile}
-                alt={movie.title}
-                className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity duration-700 grayscale-[20%] group-hover:grayscale-0"
-              />
+              {/* NEXT.JS IMAGE OPTIMIZATION */}
+              {movie.posterFile && (
+                <Image
+                  src={movie.posterFile}
+                  alt={movie.title}
+                  fill
+                  priority={true} // Crucial for LCP - preloads the Hero images
+                  unoptimized={process.env.NODE_ENV === "development"}
+                  sizes="(max-width: 640px) 192px, (max-width: 1024px) 224px, 288px"
+                  className="object-cover opacity-80 group-hover:opacity-100 transition-opacity duration-700 grayscale-[20%] group-hover:grayscale-0"
+                />
+              )}
+
               <div className="absolute inset-0 bg-gradient-to-t from-noir via-transparent to-transparent opacity-90" />
               <div className="absolute bottom-0 inset-x-0 p-3 sm:p-5 border-t border-white/5 bg-noir/80 backdrop-blur-sm">
                 <p className="text-silver font-serif font-bold text-sm sm:text-base lg:text-lg line-clamp-1">
@@ -52,7 +59,7 @@ export function Hero({ featuredMovies }) {
           ))}
         </div>
 
-        {/* TEXT CONTENT (Ordered to BOTTOM on mobile, LEFT on desktop) */}
+        {/* TEXT CONTENT */}
         <div className="space-y-6 md:space-y-8 text-center lg:text-left z-10 order-2 lg:order-1 pb-8 lg:pb-0">
           <motion.div
             initial={{ opacity: 0, y: 30 }}

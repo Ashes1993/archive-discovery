@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { GlassButton } from "@/components/ui/GlassButton";
 
 export function Spotlight({ movie }) {
@@ -11,10 +12,15 @@ export function Spotlight({ movie }) {
         <div className="absolute inset-0 bg-gradient-to-t md:bg-gradient-to-r from-noir via-noir/90 to-noir/60 z-10" />
         <div className="absolute inset-0 bg-gradient-to-t from-noir via-transparent to-noir z-10" />
         {movie.posterFile && (
-          <img
+          // NEXT.JS IMAGE OPTIMIZATION: Ultra-low quality for the background blur
+          <Image
             src={movie.posterFile}
             alt={`${movie.title} Background`}
-            className="w-full h-full object-cover blur-2xl opacity-30 scale-110"
+            fill
+            unoptimized={process.env.NODE_ENV === "development"}
+            sizes="100vw"
+            quality={30} // Reduce file size since it's just a blurry backdrop
+            className="object-cover blur-3xl opacity-30 scale-110"
           />
         )}
       </div>
@@ -23,11 +29,18 @@ export function Spotlight({ movie }) {
         {/* Visual Poster Card (Now visible on mobile, ordered to the top!) */}
         <div className="flex justify-center lg:justify-end relative group perspective-[1000px] order-1 lg:order-2 mb-4 lg:mb-0">
           <div className="absolute -inset-4 bg-gold/20 blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-1000 rounded-full" />
-          <img
-            src={movie.posterFile}
-            alt={`${movie.title} Poster`}
-            className="relative w-48 sm:w-64 md:w-80 aspect-[2/3] object-cover rounded-sm shadow-[0_20px_50px_rgba(0,0,0,0.5)] border border-white/10 rotate-0 lg:rotate-2 group-hover:rotate-0 group-hover:scale-105 transition-all duration-700"
-          />
+          <div className="relative w-48 sm:w-64 md:w-80 aspect-[2/3] rounded-sm shadow-[0_20px_50px_rgba(0,0,0,0.5)] border border-white/10 rotate-0 lg:rotate-2 group-hover:rotate-0 group-hover:scale-105 transition-all duration-700 overflow-hidden">
+            {/* NEXT.JS IMAGE OPTIMIZATION: High quality, priority preloaded */}
+            <Image
+              src={movie.posterFile}
+              alt={`${movie.title} Poster`}
+              fill
+              priority={true} // Crucial for LCP
+              unoptimized={process.env.NODE_ENV === "development"}
+              sizes="(max-width: 640px) 192px, (max-width: 768px) 256px, 320px"
+              className="object-cover"
+            />
+          </div>
         </div>
 
         {/* Content (Ordered below the poster on mobile) */}

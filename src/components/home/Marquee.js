@@ -1,5 +1,6 @@
 "use client";
 import Link from "next/link";
+import Image from "next/image";
 import { GlassCard } from "@/components/ui/GlassCard";
 
 const getImageUrl = (posterFile) => {
@@ -45,11 +46,14 @@ export function Marquee({ title, movies }) {
               >
                 <div className="relative w-full h-full bg-noir overflow-hidden rounded-sm">
                   {imageUrl ? (
-                    <img
+                    /* NEXT.JS IMAGE OPTIMIZATION */
+                    <Image
                       src={imageUrl}
                       alt={movie.title}
-                      className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-all duration-700 grayscale-[20%] group-hover:grayscale-0 group-hover:scale-105"
-                      loading="lazy"
+                      fill
+                      unoptimized={process.env.NODE_ENV === "development"}
+                      sizes="(max-width: 640px) 150px, 200px"
+                      className="object-cover opacity-80 group-hover:opacity-100 transition-all duration-700 grayscale-[20%] group-hover:grayscale-0 group-hover:scale-105"
                     />
                   ) : (
                     <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-noir to-surface p-2 text-center border-[4px] border-noir transition-transform duration-700 group-hover:scale-105">
@@ -66,7 +70,7 @@ export function Marquee({ title, movies }) {
 
                   <div className="absolute inset-0 bg-gradient-to-t from-noir via-transparent to-transparent opacity-80 group-hover:opacity-60 transition-opacity" />
 
-                  <div className="absolute bottom-0 inset-x-0 p-3 sm:p-4 bg-gradient-to-t from-noir to-transparent">
+                  <div className="absolute bottom-0 inset-x-0 p-3 sm:p-4 bg-gradient-to-t from-noir to-transparent z-10">
                     <h3 className="text-xs sm:text-sm font-serif font-bold text-silver line-clamp-1 group-hover:text-gold transition-colors drop-shadow-md">
                       {movie.title}
                     </h3>
