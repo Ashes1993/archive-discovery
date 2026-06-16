@@ -1,0 +1,78 @@
+name: Continuous Integration
+
+on:
+  push:
+    branches: [main, master, develop]
+  pull_request:
+    branches: [main, master, develop]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    # This spins up an isolated PostgreSQL container running adjacent to your code environment
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: password123
+          POSTGRES_DB: archive_discovery_test
+        ports:
+          - 5432:5432
+        # Ensures GitHub waits for Postgres to be healthy before starting the build steps
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    # Mock environment variables required to successfully build and run tests safely
+    env:
+      NODE_ENV: test
+      DATABASE_URL: "postgresql://postgres:password123@localhost:5432/archive_discovery_test?schema=public"
+      DIRECT_URL: "postgresql://postgres:password123@localhost:5432/archive_discovery_test?schema=public"
+      ADMIN_PASSCODE: "mock_passcode"
+      CLOUDINARY_CLOUD_NAME: "mock_cloud"
+      CLOUDINARY_API_KEY: "11111111111111"
+      CLOUDINARY_API_SECRET: "mock_secret"
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Cache dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Generate Prisma Client & Deploy Migrations
+        run: |
+          npx prisma migrate deploy
+          npx prisma generate
+
+      - name: Run Linter
+        run: npm run lint
+
+      - name: Build Next.js Application
+        run: npm run build
+
+      - name: Run Vitest Unit Tests
+        run: npm run test:unit
+
+      - name: Install Playwright Browsers
+        run: npx playwright install --with-deps
+
+      - name: Run Playwright E2E Tests
+        run: npm run test:e2e
