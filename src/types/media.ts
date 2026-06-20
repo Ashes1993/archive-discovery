@@ -47,7 +47,7 @@ export type RelatedMovie = Prisma.MovieGetPayload<{
   };
 }>;
 
-export type MovieListresult = {
+export type MovieListResult = {
   data: MovieWithCategories[];
   metadata: PaginationMetadata;
 };
