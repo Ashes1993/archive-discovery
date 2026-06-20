@@ -17,7 +17,7 @@ export function Marquee({ title, movies }) {
       <div className="container mx-auto px-6 mb-8 flex items-end justify-between">
         <div>
           <span className="text-gold font-mono text-xs uppercase tracking-widest mb-2 block">
-            // Now Screening
+            Now Screening
           </span>
           <h2 className="text-3xl font-serif font-bold text-silver">{title}</h2>
         </div>

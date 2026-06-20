@@ -21,7 +21,7 @@ export default async function AdminPage({ searchParams }) {
         <div className="mb-8 flex flex-col md:flex-row justify-between items-end gap-4">
           <div>
             <span className="text-gold font-mono text-xs uppercase tracking-widest mb-2 block">
-              // Database Operations
+              Database Operations
             </span>
             <h1 className="text-4xl font-serif font-bold text-silver">
               Curator Dashboard

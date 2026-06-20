@@ -82,7 +82,7 @@ export function Hero({ featuredMovies }) {
               Access a curated vault of culturally significant films,
               documentaries, and silent masterpieces.
               <span className="block mt-2 text-[10px] sm:text-sm font-mono text-zinc-400 uppercase tracking-wide">
-                // No Ads. No Subs. Pure Preservation.
+                No Ads. No Subs. Pure Preservation.
               </span>
             </p>
           </motion.div>
