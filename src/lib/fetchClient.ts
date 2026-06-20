@@ -12,7 +12,7 @@ type FetchClientResponse<T = unknown> = {
 };
 
 type FetchClientOptions = AxiosRequestConfig & {
-  body?: "unknown";
+  body?: unknown;
 };
 
 // Create a dedicated Axios instance
@@ -47,7 +47,7 @@ if (process.env.NODE_ENV === "development") {
 }
 
 // Wrapper to keep code looking like native 'fetch'
-export async function fethchClient<T = unknown>(
+export async function fetchClient<T = unknown>(
   url: string,
   options: FetchClientOptions = {},
 ): Promise<FetchClientResponse<T>> {
