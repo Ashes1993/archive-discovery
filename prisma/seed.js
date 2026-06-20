@@ -1,7 +1,7 @@
 import { PrismaClient } from "@prisma/client";
-import { fetchClient } from "../src/lib/fetchClient.js";
+import { fetchClient } from "../src/lib/fetchClient";
 import dotenv from "dotenv";
-import fs from "fs/promises"; // ADDED: For reading/writing the checkpoint file
+import fs from "fs/promises";
 
 // Load environment variables
 dotenv.config({ path: ".env" });
@@ -12,7 +12,7 @@ const prisma = new PrismaClient();
 // --- CONFIGURATION ---
 const SEARCH_URL = "https://archive.org/advancedsearch.php";
 const METADATA_BASE = "https://archive.org/metadata";
-const PROGRESS_FILE = ".seed-progress"; // The file that stores our current page
+const PROGRESS_FILE = ".seed-progress";
 
 // BATCH SETTINGS
 const PAGE_SIZE = 50;
