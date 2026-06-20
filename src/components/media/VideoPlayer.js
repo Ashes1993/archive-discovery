@@ -12,7 +12,7 @@ const formatTime = (seconds) => {
 export function VideoPlayer({ src, poster, title }) {
   const videoRef = useRef(null);
   const containerRef = useRef(null);
-  const controlsTimeoutRef = useRef(null); // Used to hide controls on mobile
+  // const controlsTimeoutRef = useRef(null);
 
   const [playing, setPlaying] = useState(false);
   const [progress, setProgress] = useState(0);
@@ -25,6 +25,8 @@ export function VideoPlayer({ src, poster, title }) {
   const [showVolume, setShowVolume] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [showControls, setShowControls] = useState(true);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [interactionNonce, setInteractionNonce] = useState(0);
 
   // --- DEVICE DETECTION ---
   useEffect(() => {
@@ -41,20 +43,29 @@ export function VideoPlayer({ src, poster, title }) {
   // --- MOBILE CONTROL VISIBILITY LOGIC ---
   const handleInteraction = () => {
     setShowControls(true);
-    if (controlsTimeoutRef.current) clearTimeout(controlsTimeoutRef.current);
-
-    // Auto-hide controls after 3 seconds if video is playing
-    if (playing) {
-      controlsTimeoutRef.current = setTimeout(() => {
-        if (isHovering === false) setShowControls(false);
-      }, 3000);
-    }
+    setInteractionNonce((prev) => prev + 1);
   };
 
+  // useEffect(() => {
+  //   return () => {
+  //     if (controlsTimeoutRef.current) clearTimeout(controlsTimeoutRef.current);
+  //   };
+  // }, []);
+
   useEffect(() => {
-    if (playing) handleInteraction();
-    else setShowControls(true); // Always show controls when paused
-  }, [playing, isHovering]);
+    // If the video is paused or the user is hovering, keep controls visible permanently
+    if (!playing || isHovering) {
+      return;
+    }
+
+    // If playing and not hovering, schedule the controls to hide after 3 seconds
+    const timeoutId = setTimeout(() => {
+      setShowControls(false);
+    }, 3000);
+
+    // Clean up the timer automatically if playing, isHovering, or interactionNonce changes
+    return () => clearTimeout(timeoutId);
+  }, [playing, isHovering, interactionNonce]);
 
   // --- PLAYBACK CONTROLS ---
   const togglePlay = () => {
@@ -95,6 +106,8 @@ export function VideoPlayer({ src, poster, title }) {
     if (!videoRef.current) return;
     const current = videoRef.current.currentTime;
     const total = videoRef.current.duration || 1;
+
+    setCurrentTime(current);
     setProgress((current / total) * 100);
     setDuration(total);
   };
@@ -187,8 +200,9 @@ export function VideoPlayer({ src, poster, title }) {
           onProgress={handleProgress}
           onWaiting={() => setBuffering(true)}
           onPlaying={() => setBuffering(false)}
-          preload="metadata" // More responsible than "auto" for large files
-          playsInline // Crucial for iOS playback
+          onLoadedMetadata={(e) => setDuration(e.target.duration)}
+          preload="metadata"
+          playsInline
         />
 
         {/* Mobile-only massive invisible click overlay to capture taps without interfering with controls */}
@@ -383,8 +397,8 @@ export function VideoPlayer({ src, poster, title }) {
 
             {/* Time Stamp */}
             <span className="text-white/80 text-[10px] md:text-xs font-mono tracking-wider ml-2 sm:ml-0">
-              {formatTime(videoRef.current?.currentTime)}{" "}
-              <span className="opacity-50">/</span> {formatTime(duration)}
+              {formatTime(currentTime)} <span className="opacity-50">/</span>{" "}
+              {formatTime(duration)}
             </span>
           </div>
 

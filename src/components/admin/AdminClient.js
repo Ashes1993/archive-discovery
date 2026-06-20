@@ -3,6 +3,7 @@
 import { useState, useTransition, useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import { updateMovieAdmin, deleteMovieAdmin } from "@/actions/admin";
 import { uploadPoster } from "@/actions/cloudinary";
 import { GlassButton } from "@/components/ui/GlassButton";
@@ -23,6 +24,7 @@ export default function AdminClient({
   const [isPending, startTransition] = useTransition();
 
   const [mounted, setMounted] = useState(false);
+  // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => setMounted(true), []);
 
   const [editingMovie, setEditingMovie] = useState(null);
@@ -202,10 +204,12 @@ export default function AdminClient({
                     </td>
                     <td className="px-6 py-4">
                       {imageUrl ? (
-                        <img
+                        <Image
                           src={imageUrl}
-                          alt="thumbnail"
-                          className="w-10 h-14 object-cover cursor-pointer border border-border-subtle hover:border-gold transition-colors"
+                          alt={movie.title || "Movie Poster"}
+                          width={40}
+                          height={56}
+                          className="object-cover cursor-pointer border border-border-subtle hover:border-gold transition-colors"
                           onClick={() => setPreviewImage(imageUrl)}
                         />
                       ) : (
@@ -304,10 +308,13 @@ export default function AdminClient({
               >
                 [Close]
               </button>
-              <img
+              <Image
                 src={previewImage}
-                alt="Preview"
-                className="w-auto h-auto max-w-full max-h-[85vh] object-contain border border-border-subtle shadow-2xl"
+                alt="Metadata Preview"
+                fill
+                sizes="(max-width: 768px) 100 vm, 600px"
+                className="object-contain border border-border-subtle shadow-2xl"
+                priority
               />
             </div>
           </div>,
