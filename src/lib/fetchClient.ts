@@ -1,5 +1,4 @@
 import axios, {
-  type AxiosError,
   type AxiosRequestConfig,
   type RawAxiosResponseHeaders,
 } from "axios";
