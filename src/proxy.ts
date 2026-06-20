@@ -1,11 +1,11 @@
-import { NextResponse } from "next/server";
+import { type NextRequest, NextResponse } from "next/server";
 
-// ADDED "default" HERE
-export default function proxy(request) {
+export default function proxy(request: NextRequest) {
   const path = request.nextUrl.pathname;
 
   console.log("🛡️ Proxy checking path:", path);
 
+  // Check whether the user is viewing the admin pages and have verified cookie value (lightweight)
   if (path.startsWith("/admin") && path !== "/admin/login") {
     const authCookie = request.cookies.get("admin_session");
 
