@@ -33,10 +33,10 @@ export default function PrivacyPage() {
               you personally.
             </p>
             <p>
-              <strong>Local Storage:</strong> We use your browser's local
-              storage to save preferences like volume settings or "continue
-              watching" markers. This data stays on your device and is never
-              sent to our servers.
+              <strong>Local Storage:</strong> We use your browser&apos;s local
+              storage to save preferences like volume settings or &quot;continue
+              watching&quot; markers. This data stays on your device and is
+              never sent to our servers.
             </p>
           </Section>
 
@@ -54,8 +54,8 @@ export default function PrivacyPage() {
               <li>
                 <strong>TMDB (The Movie Database):</strong> We use TMDB to fetch
                 high-quality movie posters and metadata. Your browser may
-                download images directly from TMDB's Content Delivery Network
-                (CDN).
+                download images directly from TMDB&apos;s Content Delivery
+                Network (CDN).
               </li>
             </ul>
           </Section>

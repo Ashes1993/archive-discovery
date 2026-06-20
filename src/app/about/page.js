@@ -66,10 +66,10 @@ export default function AboutPage() {
               </p>
               <p>
                 <strong className="text-silver">Archive Discovery</strong> was
-                built to solve the "Discovery Problem." The files exist, but
-                finding them is hard. We index, categorize, and beautify the
-                metadata to make browsing history feel as seamless as a modern
-                streaming service.
+                built to solve the &quot;Discovery Problem.&quot; The files
+                exist, but finding them is hard. We index, categorize, and
+                beautify the metadata to make browsing history feel as seamless
+                as a modern streaming service.
               </p>
             </div>
 

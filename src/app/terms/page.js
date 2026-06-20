@@ -42,7 +42,7 @@ export default function TermsPage() {
             </p>
             <p>
               By using our platform, you agree to respect the intellectual
-              property of TMDB's contributors. You may not scrape or
+              property of TMDB&apos;s contributors. You may not scrape or
               mass-download metadata provided by TMDB through our service.
             </p>
           </Section>
@@ -54,17 +54,17 @@ export default function TermsPage() {
             </p>
             <p>
               <strong>The Interface:</strong> The design, code, and curation of
-              "Archive Discovery" are copyrighted by the creators. You may not
-              scrape our curation data without permission.
+              &quot;Archive Discovery&quot; are copyrighted by the creators. You
+              may not scrape our curation data without permission.
             </p>
           </Section>
 
           <Section title="4. Disclaimer of Warranties">
             <p>
-              The service is provided "as is." We do not guarantee the
+              The service is provided &quot;as is.&quot; We do not guarantee the
               preservation of these links in perpetuity, as we rely on the
-              Internet Archive's API availability. We are not liable for any
-              historical inaccuracies found within the films.
+              Internet Archive&apos;s API availability. We are not liable for
+              any historical inaccuracies found within the films.
             </p>
           </Section>
 

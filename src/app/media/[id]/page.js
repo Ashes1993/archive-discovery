@@ -167,8 +167,8 @@ export default async function MoviePage({ params }) {
                       </span>
                     </div>
                     <p className="text-pewter text-xs sm:text-sm leading-relaxed italic font-serif border-l-2 border-border-subtle pl-4 mb-4">
-                      "{review.body.substring(0, 150)}
-                      {review.body.length > 150 ? "..." : ""}"
+                      &quot;{review.body.substring(0, 150)}
+                      {review.body.length > 150 ? "..." : ""}&quot;
                     </p>
                     <div className="text-[9px] font-mono text-zinc-500 uppercase">
                       {new Date(review.date).toLocaleDateString()}
