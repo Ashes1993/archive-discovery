@@ -1,6 +1,12 @@
 "use server";
 
+import type { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
+import type {
+  MovieDetailsResult,
+  MovieListResult,
+  MovieSearchParams,
+} from "@/types/media";
 
 export async function getMovies({
   query = "",
@@ -8,12 +14,11 @@ export async function getMovies({
   limit = 20,
   sort = "popular",
   genre = "all",
-} = {}) {
+}: MovieSearchParams = {}): Promise<MovieListResult> {
   try {
     const skip = (page - 1) * limit;
 
-    // 1. Dynamic "Where" Clause
-    const where = {};
+    const where: Prisma.MovieWhereInput = {};
 
     // Search Logic
     if (query) {
@@ -32,8 +37,9 @@ export async function getMovies({
       };
     }
 
-    // 2. Dynamic "Order By"
-    let orderBy = {};
+    // Dynamic "Order By"
+    let orderBy: Prisma.MovieOrderByWithRelationInput;
+
     switch (sort) {
       case "newest":
         orderBy = { year: "desc" };
@@ -44,13 +50,14 @@ export async function getMovies({
       case "rating":
         orderBy = { rating: "desc" };
         break;
+      case "downloads":
       case "popular":
       default:
         orderBy = { downloads: "desc" };
         break;
     }
 
-    // 3. Fetch Data
+    // Fetch Data
     const [movies, total] = await Promise.all([
       prisma.movie.findMany({
         where,
@@ -73,13 +80,15 @@ export async function getMovies({
     };
   } catch (error) {
     console.error("❌ Failed to fetch movies:", error);
-    return { data: [], metadata: { total: 0, page: 1, totalPages: 0 } };
+    return { data: [], metadata: { total: 0, page, limit, totalPages: 0 } };
   }
 }
 
-export async function getMovie(archiveId) {
+export async function getMovie(
+  archiveId: string,
+): Promise<MovieDetailsResult | null> {
   try {
-    // 1. Fetch the main movie
+    // Fetch the main movie
     const movie = await prisma.movie.findUnique({
       where: { archiveId },
       include: {
@@ -91,29 +100,33 @@ export async function getMovie(archiveId) {
 
     if (!movie) return null;
 
-    // 2. Fetch "Related" movies (Same category, excluding current one)
+    // Fetch "Related" movies (Same category, excluding current one)
     // We take the first category to find matches
     const primaryCategory = movie.categories[0]?.name;
 
-    const related = await prisma.movie.findMany({
-      where: {
-        AND: [
-          { archiveId: { not: archiveId } }, // Exclude current
-          { categories: { some: { name: primaryCategory } } },
-        ],
-      },
-      take: 6, // Show 6 suggestions
-      orderBy: { downloads: "desc" },
-      include: { categories: true },
-    });
+    const related = primaryCategory
+      ? await prisma.movie.findMany({
+          where: {
+            AND: [
+              { archiveId: { not: archiveId } },
+              { categories: { some: { name: primaryCategory } } },
+            ],
+          },
+          take: 6,
+          orderBy: { downloads: "desc" },
+          include: { categories: true },
+        })
+      : [];
 
-    // Fallback: If no related found (e.g. unique genre), just get popular ones
+    // Fallback: If no related found, just get popular ones
     if (related.length === 0) {
       const popular = await prisma.movie.findMany({
         where: { archiveId: { not: archiveId } },
         take: 6,
         orderBy: { downloads: "desc" },
+        include: { categories: true },
       });
+
       return { movie, related: popular };
     }
 
