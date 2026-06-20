@@ -1,7 +1,22 @@
-import axios from "axios";
+import axios, {
+  type AxiosError,
+  type AxiosRequestConfig,
+  type RawAxiosResponseHeaders,
+} from "axios";
 import { HttpsProxyAgent } from "https-proxy-agent";
 
-// 1. Create a dedicated Axios instance
+type FetchClientResponse<T = unknown> = {
+  ok: boolean;
+  status: number;
+  json: () => Promise<T>;
+  headers?: RawAxiosResponseHeaders;
+};
+
+type FetchClientOptions = AxiosRequestConfig & {
+  body?: "unknown";
+};
+
+// Create a dedicated Axios instance
 const apiClient = axios.create({
   timeout: 30000,
   headers: {
@@ -10,10 +25,10 @@ const apiClient = axios.create({
   },
 });
 
-// 2. Inject Proxy
+// Inject Proxy
 if (process.env.NODE_ENV === "development") {
   // Use env var or fallback to standard V2Ray HTTP port
-  const proxyUrl = process.env.DEV_PROXY_URL || "http://127.0.0.1:10809";
+  const proxyUrl = process.env.DEV_PROXY_URL || "http://127.0.0.1:50765";
 
   try {
     const httpsAgent = new HttpsProxyAgent(proxyUrl);
@@ -22,22 +37,24 @@ if (process.env.NODE_ENV === "development") {
     apiClient.defaults.httpAgent = httpsAgent;
     apiClient.defaults.httpsAgent = httpsAgent;
 
-    // 🚨 CRITICAL FIX: Disable Axios default proxy handling so it uses our agent
+    // Disable Axios default proxy handling so it uses my agent
     apiClient.defaults.proxy = false;
 
     console.log(`🔒 Proxy Active: Routing traffic through ${proxyUrl}`);
-  } catch (err) {
-    console.warn("⚠️ Proxy setup failed:", err.message);
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    console.warn("⚠️ Proxy setup failed:", message);
   }
 }
 
-/**
- * Wrapper to keep our code looking like native 'fetch'
- */
-export const fetchClient = async (url, options = {}) => {
+// Wrapper to keep code looking like native 'fetch'
+export async function fethchClient<T = unknown>(
+  url: string,
+  options: FetchClientOptions = {},
+): Promise<FetchClientResponse<T>> {
   try {
-    const response = await apiClient({
-      url: url,
+    const response = await apiClient<T>({
+      url,
       method: options.method || "GET",
       data: options.body,
       // Allow overriding defaults per request if needed
@@ -52,17 +69,18 @@ export const fetchClient = async (url, options = {}) => {
       headers: response.headers,
     };
   } catch (error) {
-    // Handle Axios Error Responses (404, 500, etc)
-    if (error.response) {
+    if (axios.isAxiosError<T>(error) && error.response) {
       return {
         ok: false,
         status: error.response.status,
-        json: async () => error.response.data,
+        json: async () => error.response?.data as T,
+        headers: error.response.headers,
       };
     }
 
     // Handle Network Errors
-    console.error(`🔥 Network Error on ${url}:`, error.message);
+    const message = error instanceof Error ? error.message : String(error);
+    console.error(`🔥 Network Error on ${url}:`, message);
     throw error;
   }
-};
+}
