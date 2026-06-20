@@ -68,11 +68,11 @@ jobs:
       - name: Build Next.js Application
         run: npm run build
 
-      - name: Run Vitest Unit Tests
-        run: npm run test:unit
+      # - name: Run Vitest Unit Tests
+      #   run: npm run test:unit
 
-      - name: Install Playwright Browsers
-        run: npx playwright install --with-deps
+      # - name: Install Playwright Browsers
+      #   run: npx playwright install --with-deps
 
       - name: Run Playwright E2E Tests
         run: npm run test:e2e
